@@ -1,0 +1,340 @@
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.006402
+reconst_loss *lambda:  0.002577871084213257
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.0002613569376990199
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: 0.004850
+reconst_loss *lambda:  0.001837921142578125
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00016759606078267097
+
+Train Epoch: 1 [6000/24000 (25%)]	Loss: 0.004900
+reconst_loss *lambda:  0.0019739283248782157
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.0001768590766005218
+
+Train Epoch: 1 [8000/24000 (33%)]	Loss: 0.003201
+reconst_loss *lambda:  0.0012148292735219002
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00014952922938391567
+
+Train Epoch: 1 [10000/24000 (42%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [12000/24000 (50%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [14000/24000 (58%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [16000/24000 (67%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.007314
+reconst_loss *lambda:  0.003043730556964874
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.0003424920607358217
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: 0.005126
+reconst_loss *lambda:  0.0019810399040579795
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00020952716004103423
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+Start training
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.004956
+reconst_loss *lambda:  0.0017764925956726073
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.0002614661352708936
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [6000/24000 (25%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [8000/24000 (33%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [10000/24000 (42%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.005092
+reconst_loss *lambda:  0.00184639822691679
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00032430435530841353
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: 0.004908
+reconst_loss *lambda:  0.0021684946492314338
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  7.655154331587255e-05
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.005158
+reconst_loss *lambda:  0.0019468978047370912
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.0003259618766605854
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: 0.004660
+reconst_loss *lambda:  0.001994570903480053
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00011348576517775655
+
+Train Epoch: 1 [6000/24000 (25%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.004931
+reconst_loss *lambda:  0.002032220736145973
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00012729066656902432
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: 0.003824
+reconst_loss *lambda:  0.0016741344705224037
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  6.897835992276668e-05
+
+Train Epoch: 1 [6000/24000 (25%)]	Loss: 0.002911
+reconst_loss *lambda:  0.0012047503143548966
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  7.654848741367459e-05
+
+Train Epoch: 1 [8000/24000 (33%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [10000/24000 (42%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [12000/24000 (50%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [14000/24000 (58%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [16000/24000 (67%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [18000/24000 (75%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [20000/24000 (83%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [22000/24000 (92%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+====> Epoch: 1 Average loss: nan
+====> Epoch: 1 Average reconst_loss *lambda: nan
+====> Epoch: 1 Average mono_loss *lambda: nan
+====> Epoch: 1 Average sparse_loss *lambda: nan
+====> Epoch: 1 Average squared_mahalanobis_distance_loss *lambda: nan
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.005075
+reconst_loss *lambda:  0.0019745444878935814
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00028415326960384846
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.005238
+reconst_loss *lambda:  0.0020170938223600388
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00021250930149108171
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [6000/24000 (25%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.004963
+reconst_loss *lambda:  0.0019292371347546578
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00017100260592997074
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [6000/24000 (25%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [8000/24000 (33%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+
+Train Epoch: 1 [10000/24000 (42%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.005843
+reconst_loss *lambda:  0.0023526910692453383
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00018092800164595246
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: 0.005023
+reconst_loss *lambda:  0.0019027726724743844
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00020497776567935945
+
+Train Epoch: 1 [6000/24000 (25%)]	Loss: 0.003852
+reconst_loss *lambda:  0.0014180819503962993
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00015721675008535386
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.006180
+reconst_loss *lambda:  0.0023264750838279725
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.0003455444471910596
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: 0.004797
+reconst_loss *lambda:  0.0018313858658075334
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00018573907436802983
+
+Train Epoch: 1 [6000/24000 (25%)]	Loss: 0.003718
+reconst_loss *lambda:  0.0013386299833655357
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00015919585712254047
+
+Train Epoch: 1 [8000/24000 (33%)]	Loss: 0.003470
+reconst_loss *lambda:  0.0013825759291648866
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  9.616176248528063e-05
+Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.023520
+reconst_loss *lambda:  0.009443438798189163
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.007921113818883895
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.004962
+reconst_loss *lambda:  0.0018819421529769897
+sparse_loss *lambda:  0.0
+squared_mahalanobis_distance_loss *lambda:  0.00025713061913847925
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: nan
+reconst_loss *lambda:  nan
+sparse_loss *lambda:  nan
+squared_mahalanobis_distance_loss *lambda:  nan
