@@ -303,39 +303,39 @@ def train(epoch,min_train_loss):
 
 
 
-        # networkにforwardにする
-        primary_color_pack_365 = primary_color_layers_365.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
-        pred_alpha_layers_pack_365 = mask_generator(img_365, primary_color_pack_365)
+        # # networkにforwardにする
+        # primary_color_pack_365 = primary_color_layers_365.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+        # pred_alpha_layers_pack_365 = mask_generator(img_365, primary_color_pack_365)
 
-        pred_alpha_layers_365 = pred_alpha_layers_pack_365.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
+        # pred_alpha_layers_365 = pred_alpha_layers_pack_365.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
 
-        # 正規化などのprocessingを行う
-        processed_alpha_layers_365 = alpha_normalize(pred_alpha_layers_365)
+        # # 正規化などのprocessingを行う
+        # processed_alpha_layers_365 = alpha_normalize(pred_alpha_layers_365)
 
-        # mono_color_layers_packの作成．ひとつのtensorにしておく．
-        #mono_color_layers = primary_color_layers * processed_alpha_layers
-        mono_color_layers_365 = torch.cat((primary_color_layers_365, processed_alpha_layers_365), 2) #shape: bn, ln, 4, h, w
-        mono_color_layers_pack_365 = mono_color_layers_365.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+        # # mono_color_layers_packの作成．ひとつのtensorにしておく．
+        # #mono_color_layers = primary_color_layers * processed_alpha_layers
+        # mono_color_layers_365 = torch.cat((primary_color_layers_365, processed_alpha_layers_365), 2) #shape: bn, ln, 4, h, w
+        # mono_color_layers_pack_365 = mono_color_layers_365.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
 
-        # ResiduePredictorの出力をレイヤーごとにviewする 逐层查看Residue Predictor的输出
-        residue_pack_365  = residue_predictor(img_365, mono_color_layers_pack_365)
-        residue_365 = residue_pack_365.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
-        #pred_unmixed_rgb_layers = mono_color_layers + residue * processed_alpha_layers
-        pred_unmixed_rgb_layers_365 = torch.clamp((primary_color_layers_365 + residue_365), min=0., max=1.0)# * processed_alpha_layers
+        # # ResiduePredictorの出力をレイヤーごとにviewする 逐层查看Residue Predictor的输出
+        # residue_pack_365  = residue_predictor(img_365, mono_color_layers_pack_365)
+        # residue_365 = residue_pack_365.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
+        # #pred_unmixed_rgb_layers = mono_color_layers + residue * processed_alpha_layers
+        # pred_unmixed_rgb_layers_365 = torch.clamp((primary_color_layers_365 + residue_365), min=0., max=1.0)# * processed_alpha_layers
 
-        # alpha addしてreconst_imgを作成する
-        #reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
-        reconst_img_365 = (pred_unmixed_rgb_layers_365 * processed_alpha_layers_365).sum(dim=1)
-        mono_color_reconst_img_365 = (primary_color_layers_365 * processed_alpha_layers_365).sum(dim=1)
+        # # alpha addしてreconst_imgを作成する
+        # #reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
+        # reconst_img_365 = (pred_unmixed_rgb_layers_365 * processed_alpha_layers_365).sum(dim=1)
+        # mono_color_reconst_img_365 = (primary_color_layers_365 * processed_alpha_layers_365).sum(dim=1)
 
-        # Culculate loss.
-        r_loss_365 = reconst_loss(reconst_img_365, img_365, type=args.reconst_loss_type) * args.rec_loss_lambda
-        m_loss_365 = mono_color_reconst_loss(mono_color_reconst_img_365, img_365) * args.m_loss_lambda
-        s_loss_365 = sparse_loss(processed_alpha_layers_365) * args.sparse_loss_lambda
-        #print('total_loss: ', total_loss)
-        d_loss_365 = squared_mahalanobis_distance_loss(primary_color_layers_365.detach(), processed_alpha_layers_365, pred_unmixed_rgb_layers_365) * args.distance_loss_lambda
+        # # Culculate loss.
+        # r_loss_365 = reconst_loss(reconst_img_365, img_365, type=args.reconst_loss_type) * args.rec_loss_lambda
+        # m_loss_365 = mono_color_reconst_loss(mono_color_reconst_img_365, img_365) * args.m_loss_lambda
+        # s_loss_365 = sparse_loss(processed_alpha_layers_365) * args.sparse_loss_lambda
+        # #print('total_loss: ', total_loss)
+        # d_loss_365 = squared_mahalanobis_distance_loss(primary_color_layers_365.detach(), processed_alpha_layers_365, pred_unmixed_rgb_layers_365) * args.distance_loss_lambda
 
-        total_loss_365 = r_loss_365 + m_loss_365 + s_loss_365 + d_loss_365
+        # total_loss_365 = r_loss_365 + m_loss_365 + s_loss_365 + d_loss_365
 
         
         processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
@@ -343,8 +343,8 @@ def train(epoch,min_train_loss):
         loss = criterion(output, mask)
         dice = dice_coef(output, mask)
 
-        total_loss.backward(retain_graph=True)
-        total_loss_365.backward(retain_graph=True)
+        total_loss.backward(retain_graph=False)
+        # total_loss_365.backward(retain_graph=False)
         loss.backward()
         optimizer.step()
         optimizerSeg.step()
