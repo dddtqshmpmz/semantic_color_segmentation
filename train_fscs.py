@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description='baseline')
 parser.add_argument('--run_name', type=str, default='train', help='run-name. This name is used for output folder.')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
-parser.add_argument('--epochs', type=int, default=5, metavar='N', ## 10
+parser.add_argument('--epochs', type=int, default=50, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--no_cuda', action='store_true', default=False,
                     help='enables CUDA training')
@@ -121,6 +121,8 @@ def train(epoch,min_train_loss):
     m_loss_mean = 0
     s_loss_mean = 0
     d_loss_mean = 0
+    batch_num = 0
+
     for batch_idx, (target_img, primary_color_layers) in enumerate(train_loader):
         target_img = target_img.to(device) # bn, 3ch, h, w
         primary_color_layers = primary_color_layers.to(device)
@@ -164,6 +166,13 @@ def train(epoch,min_train_loss):
         d_loss = squared_mahalanobis_distance_loss(primary_color_layers.detach(), processed_alpha_layers, pred_unmixed_rgb_layers) * args.distance_loss_lambda
 
         total_loss = r_loss + m_loss + s_loss + d_loss
+
+        if (math.isnan(total_loss.item())):
+            print('----------------------------------------- total_loss is nan, continue... -----------------------------------------')
+            continue
+        
+        batch_num += 1
+
         total_loss.backward()
         train_loss += total_loss.item()
         r_loss_mean += r_loss.item()
@@ -193,11 +202,11 @@ def train(epoch,min_train_loss):
                        'results/%s/train_ep_' % args.run_name + str(epoch) + '_ln_%02d_target_img.png' % save_layer_number)
                 
                 
-    train_loss = train_loss / len(train_loader.dataset)
-    r_loss_mean = r_loss_mean / len(train_loader.dataset)
-    m_loss_mean = m_loss_mean / len(train_loader.dataset)
-    s_loss_mean = s_loss_mean / len(train_loader.dataset)
-    d_loss_mean = d_loss_mean / len(train_loader.dataset)
+    train_loss = train_loss / batch_num
+    r_loss_mean = r_loss_mean / batch_num
+    m_loss_mean = m_loss_mean / batch_num
+    s_loss_mean = s_loss_mean / batch_num
+    d_loss_mean = d_loss_mean / batch_num
 
     print('====> Epoch: {} Average loss: {:.6f}'.format(epoch, train_loss ))
     print('====> Epoch: {} Average reconst_loss *lambda: {:.6f}'.format(epoch, r_loss_mean ))

@@ -1,6 +1,6 @@
 from __future__ import print_function
 import argparse
-from math import nan
+from math import isnan, nan
 import math
 import numpy as np
 import torch
@@ -11,7 +11,7 @@ from torchvision import datasets, transforms
 import torch.backends.cudnn as cudnn
 from torchvision.utils import make_grid, save_image
 from net import MaskGenerator, ResiduePredictor
-from mydataset import MyDataset,MyDatasetMulti, MyDatasetIHC_365
+from mydataset import MyDataset, MyDatasetIHC,MyDatasetMulti, MyDatasetIHC_365
 import pytorch_ssim
 import cv2
 import os
@@ -48,6 +48,9 @@ parser = argparse.ArgumentParser(description='baseline')
 parser.add_argument('--run_name', type=str, default='train', help='run-name. This name is used for output folder.')
 parser.add_argument('--batch_size', type=int, default=20, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
+
+parser.add_argument('--after_batch_size', type=int, default=32, metavar='N',  ## 32-> 4
+                    help='input batch size for training after color model complete (default: 32)')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--no_cuda', action='store_true', default=False,
@@ -70,7 +73,7 @@ parser.add_argument('--save_layer_train', type=int, default=1,
                     help='save_layer_train')
 
 # 让颜色分割网络收敛的慢一些
-parser.add_argument('--color_lr',default=1e-3, type=float,
+parser.add_argument('--color_lr',default=5e-4, type=float,
                     help='color learning rate')  # 1e-3
 
 
@@ -181,13 +184,26 @@ train_loader = torch.utils.data.DataLoader(
     )
 
 
-val_dataset = MyDatasetIHC_365( args.csv_path_365, args.csv_path_ihc, args.num_primary_color, mode='val')
-val_loader = torch.utils.data.DataLoader(
-    val_dataset,
-    batch_size=1,
+train_after_dataset =  MyDatasetIHC( args.csv_path_ihc ,args.num_primary_color, mode='train')
+train_after_loader = torch.utils.data.DataLoader(
+    train_after_dataset,
+    batch_size=args.after_batch_size,
+    shuffle=True,
+    num_workers=args.num_workers,
+    worker_init_fn=lambda x: np.random.seed(),
+    drop_last=True,
+    pin_memory=True
+)
+
+
+val_after_dataset =  MyDatasetIHC( args.csv_path_ihc ,args.num_primary_color, mode='val')
+val_after_loader = torch.utils.data.DataLoader(
+    val_after_dataset,
+    batch_size= args.after_batch_size , # 1
     shuffle=False,
-    num_workers=1,
-    )
+    num_workers= args.num_workers , # 1
+    drop_last=True  # 加的这句
+)
 
 mask_generator = MaskGenerator(args.num_primary_color).to(device)
 mask_generator = nn.DataParallel(mask_generator)
@@ -205,17 +221,18 @@ optimizer = optim.Adam(params, lr=config['color_lr'], betas=(0.0, 0.99)) # 0926
 
 
 # 加载新参数
-model = smp.UnetWithColor('efficientnet-b3', in_channels= 7 ,
+model = smp.UnetWithColor('efficientnet-b3', in_channels= 3+7 ,
                      classes= 1, encoder_weights='imagenet').cuda()
-model = nn.DataParallel(model)
 model = model.cuda()
+model= nn.DataParallel(model,device_ids=[0,1,2,3])
+
 paramsSeg = filter(lambda p: p.requires_grad, model.parameters())
 
 optimizerSeg = optim.Adam(paramsSeg, lr=config['lr'], weight_decay=config['weight_decay'])
 
 if config['scheduler'] == 'CosineAnnealingLR':
     scheduler = lr_scheduler.CosineAnnealingLR(
-        optimizer, T_max=config['epochs'], eta_min=config['min_lr'])
+        optimizerSeg, T_max=config['epochs'], eta_min=config['min_lr'])
 
 if config['loss'] == 'BCEWithLogitsLoss':
     criterion = nn.BCEWithLogitsLoss().cuda()
@@ -244,6 +261,7 @@ def train(epoch,min_train_loss):
     m_loss_mean = 0
     s_loss_mean = 0
     d_loss_mean = 0
+    batch_num = 0
 
     pbar = tqdm(total=len(train_loader))
     for batch_idx, (target_img, primary_color_layers, mask, img_365, primary_color_layers_365) in enumerate(train_loader):
@@ -257,7 +275,46 @@ def train(epoch,min_train_loss):
         #primary_color_layers = primary_color_layers.to(device) # bn, num_primary_color, 3ch, h, w
 
         optimizer.zero_grad()
-        optimizerSeg.zero_grad()
+        
+
+        # networkにforwardにする
+        primary_color_pack_365 = primary_color_layers_365.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+        pred_alpha_layers_pack_365 = mask_generator(img_365, primary_color_pack_365)
+
+        pred_alpha_layers_365 = pred_alpha_layers_pack_365.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
+
+        # 正規化などのprocessingを行う
+        processed_alpha_layers_365 = alpha_normalize(pred_alpha_layers_365)
+
+        # mono_color_layers_packの作成．ひとつのtensorにしておく．
+        #mono_color_layers = primary_color_layers * processed_alpha_layers
+        mono_color_layers_365 = torch.cat((primary_color_layers_365, processed_alpha_layers_365), 2) #shape: bn, ln, 4, h, w
+        mono_color_layers_pack_365 = mono_color_layers_365.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+
+        # ResiduePredictorの出力をレイヤーごとにviewする 逐层查看Residue Predictor的输出
+        residue_pack_365  = residue_predictor(img_365, mono_color_layers_pack_365)
+        residue_365 = residue_pack_365.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
+        #pred_unmixed_rgb_layers = mono_color_layers + residue * processed_alpha_layers
+        pred_unmixed_rgb_layers_365 = torch.clamp((primary_color_layers_365 + residue_365), min=0., max=1.0)# * processed_alpha_layers
+
+        # alpha addしてreconst_imgを作成する
+        #reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
+        reconst_img_365 = (pred_unmixed_rgb_layers_365 * processed_alpha_layers_365).sum(dim=1)
+        mono_color_reconst_img_365 = (primary_color_layers_365 * processed_alpha_layers_365).sum(dim=1)
+
+        # Culculate loss.
+        r_loss_365 = reconst_loss(reconst_img_365, img_365, type=args.reconst_loss_type) * args.rec_loss_lambda
+        m_loss_365 = mono_color_reconst_loss(mono_color_reconst_img_365, img_365) * args.m_loss_lambda
+        s_loss_365 = sparse_loss(processed_alpha_layers_365) * args.sparse_loss_lambda
+        #print('total_loss: ', total_loss)
+        d_loss_365 = squared_mahalanobis_distance_loss(primary_color_layers_365.detach(), processed_alpha_layers_365, pred_unmixed_rgb_layers_365) * args.distance_loss_lambda
+
+        total_loss_365 = r_loss_365 + m_loss_365 + s_loss_365 + d_loss_365
+        if ( math.isnan(total_loss_365.item()) ):
+            min_train_loss = -1
+            break
+        
+        batch_num += 1
 
         # networkにforwardにする
         primary_color_pack = primary_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
@@ -289,62 +346,26 @@ def train(epoch,min_train_loss):
         # Culculate loss.
         r_loss = reconst_loss(reconst_img, target_img, type=args.reconst_loss_type) * args.rec_loss_lambda
         m_loss = mono_color_reconst_loss(mono_color_reconst_img, target_img) * args.m_loss_lambda
-        s_loss = sparse_loss(processed_alpha_layers) * args.sparse_loss_lambda
+        # s_loss = sparse_loss(processed_alpha_layers) * args.sparse_loss_lambda
         #print('total_loss: ', total_loss)
         d_loss = squared_mahalanobis_distance_loss(primary_color_layers.detach(), processed_alpha_layers, pred_unmixed_rgb_layers) * args.distance_loss_lambda
 
-        total_loss = r_loss + m_loss + s_loss + d_loss
-        
+        total_loss = r_loss + m_loss + d_loss
         train_loss += total_loss.item()
         r_loss_mean += r_loss.item()
         m_loss_mean += m_loss.item()
-        s_loss_mean += s_loss.item()
         d_loss_mean += d_loss.item()
 
 
-
-        # # networkにforwardにする
-        # primary_color_pack_365 = primary_color_layers_365.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
-        # pred_alpha_layers_pack_365 = mask_generator(img_365, primary_color_pack_365)
-
-        # pred_alpha_layers_365 = pred_alpha_layers_pack_365.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
-
-        # # 正規化などのprocessingを行う
-        # processed_alpha_layers_365 = alpha_normalize(pred_alpha_layers_365)
-
-        # # mono_color_layers_packの作成．ひとつのtensorにしておく．
-        # #mono_color_layers = primary_color_layers * processed_alpha_layers
-        # mono_color_layers_365 = torch.cat((primary_color_layers_365, processed_alpha_layers_365), 2) #shape: bn, ln, 4, h, w
-        # mono_color_layers_pack_365 = mono_color_layers_365.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
-
-        # # ResiduePredictorの出力をレイヤーごとにviewする 逐层查看Residue Predictor的输出
-        # residue_pack_365  = residue_predictor(img_365, mono_color_layers_pack_365)
-        # residue_365 = residue_pack_365.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
-        # #pred_unmixed_rgb_layers = mono_color_layers + residue * processed_alpha_layers
-        # pred_unmixed_rgb_layers_365 = torch.clamp((primary_color_layers_365 + residue_365), min=0., max=1.0)# * processed_alpha_layers
-
-        # # alpha addしてreconst_imgを作成する
-        # #reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
-        # reconst_img_365 = (pred_unmixed_rgb_layers_365 * processed_alpha_layers_365).sum(dim=1)
-        # mono_color_reconst_img_365 = (primary_color_layers_365 * processed_alpha_layers_365).sum(dim=1)
-
-        # # Culculate loss.
-        # r_loss_365 = reconst_loss(reconst_img_365, img_365, type=args.reconst_loss_type) * args.rec_loss_lambda
-        # m_loss_365 = mono_color_reconst_loss(mono_color_reconst_img_365, img_365) * args.m_loss_lambda
-        # s_loss_365 = sparse_loss(processed_alpha_layers_365) * args.sparse_loss_lambda
-        # #print('total_loss: ', total_loss)
-        # d_loss_365 = squared_mahalanobis_distance_loss(primary_color_layers_365.detach(), processed_alpha_layers_365, pred_unmixed_rgb_layers_365) * args.distance_loss_lambda
-
-        # total_loss_365 = r_loss_365 + m_loss_365 + s_loss_365 + d_loss_365
-
-        
         processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
-        output = model(torch.cat((target_img.detach(),processed_alpha_layers_[:,:4,:,:]),1),processed_alpha_layers_)
+        output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
+        # output = model(target_img.detach())
         loss = criterion(output, mask)
         dice = dice_coef(output, mask)
 
-        total_loss.backward(retain_graph=False)
-        # total_loss_365.backward(retain_graph=False)
+        total_loss_365.backward(retain_graph=False)
+
+        optimizerSeg.zero_grad()
         loss.backward()
         optimizer.step()
         optimizerSeg.step()
@@ -369,7 +390,7 @@ def train(epoch,min_train_loss):
                 100. * batch_idx / len(train_loader),
                 total_loss.item() / len(target_img)))
             print('reconst_loss *lambda: ', r_loss.item() / len(target_img))
-            print('sparse_loss *lambda: ', s_loss.item() / len(target_img))
+            # print('sparse_loss *lambda: ', s_loss.item() / len(target_img))
             print('squared_mahalanobis_distance_loss *lambda: ', d_loss.item() / len(target_img))
 
 
@@ -384,16 +405,15 @@ def train(epoch,min_train_loss):
         
     pbar.close()
 
-    train_loss = train_loss / len(train_loader.dataset)
-    r_loss_mean = r_loss_mean / len(train_loader.dataset)
-    m_loss_mean = m_loss_mean / len(train_loader.dataset)
-    s_loss_mean = s_loss_mean / len(train_loader.dataset)
-    d_loss_mean = d_loss_mean / len(train_loader.dataset)
+    train_loss = train_loss / batch_num
+    r_loss_mean = r_loss_mean / batch_num
+    m_loss_mean = m_loss_mean / batch_num
+    d_loss_mean = d_loss_mean / batch_num
 
     print('====> Epoch: {} Average loss: {:.6f}'.format(epoch, train_loss ))
     print('====> Epoch: {} Average reconst_loss *lambda: {:.6f}'.format(epoch, r_loss_mean ))
     print('====> Epoch: {} Average mono_loss *lambda: {:.6f}'.format(epoch, m_loss_mean ))
-    print('====> Epoch: {} Average sparse_loss *lambda: {:.6f}'.format(epoch, s_loss_mean ))
+    # print('====> Epoch: {} Average sparse_loss *lambda: {:.6f}'.format(epoch, s_loss_mean ))
     print('====> Epoch: {} Average squared_mahalanobis_distance_loss *lambda: {:.6f}'.format(epoch, d_loss_mean ))
 
     if (math.isnan(train_loss)):
@@ -404,6 +424,93 @@ def train(epoch,min_train_loss):
         min_train_loss = train_loss
         torch.save(mask_generator.state_dict(), 'results/%s/mask_generator.pth' % (args.run_name))
         torch.save(residue_predictor.state_dict(), 'results/%s/residue_predictor.pth' % args.run_name)
+
+    return OrderedDict([('loss', avg_meters['loss'].avg), ('dice', avg_meters['dice'].avg),('min_train_loss',min_train_loss)])
+
+
+def train_after_finish_color_seg(epoch,min_train_loss):
+    avg_meters = {'loss': AverageMeter(),
+                  'dice': AverageMeter()}  # iou
+
+    # eval mode
+    mask_generator.eval()
+    residue_predictor.eval()
+    model.train()
+
+    pbar = tqdm(total=len(train_after_loader))
+    for batch_idx, (target_img, primary_color_layers, mask) in enumerate(train_after_loader):
+
+        target_img = target_img.to(device) # bn, 3ch, h, w
+        primary_color_layers = primary_color_layers.to(device)
+        mask = mask.to(device)
+
+        #primary_color_layers = primary_color_layers.to(device) # bn, num_primary_color, 3ch, h, w
+
+        
+        
+
+        # networkにforwardにする
+        primary_color_pack = primary_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+        pred_alpha_layers_pack = mask_generator(target_img, primary_color_pack)
+        #print('pred_alpha_layers_pack.size():', pred_alpha_layers_pack.size())
+
+        # MaskGの出力をレイヤーごとにviewする
+        pred_alpha_layers = pred_alpha_layers_pack.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
+
+        # 正規化などのprocessingを行う
+        processed_alpha_layers = alpha_normalize(pred_alpha_layers)
+
+        # mono_color_layers_packの作成．ひとつのtensorにしておく．
+        #mono_color_layers = primary_color_layers * processed_alpha_layers
+        mono_color_layers = torch.cat((primary_color_layers, processed_alpha_layers), 2) #shape: bn, ln, 4, h, w
+        mono_color_layers_pack = mono_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+
+        # ResiduePredictorの出力をレイヤーごとにviewする 逐层查看Residue Predictor的输出
+        residue_pack  = residue_predictor(target_img, mono_color_layers_pack)
+        residue = residue_pack.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
+        #pred_unmixed_rgb_layers = mono_color_layers + residue * processed_alpha_layers
+        pred_unmixed_rgb_layers = torch.clamp((primary_color_layers + residue), min=0., max=1.0)# * processed_alpha_layers
+
+        # alpha addしてreconst_imgを作成する
+        #reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
+        reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
+        mono_color_reconst_img = (primary_color_layers * processed_alpha_layers).sum(dim=1)
+
+        
+        processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
+        output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
+        # output = model(target_img.detach())
+        loss = criterion(output, mask)
+        dice = dice_coef(output, mask)
+
+        optimizerSeg.zero_grad()
+        loss.backward()
+        optimizerSeg.step()
+
+        avg_meters['loss'].update(loss.item(), target_img.size(0))
+        avg_meters['dice'].update(dice, target_img.size(0))
+
+
+        postfix = OrderedDict([
+            ('loss', avg_meters['loss'].avg),
+            ('dice', avg_meters['dice'].avg),
+            #('iou', avg_meters['iou'].avg),
+        ])
+        pbar.set_postfix(postfix)
+        pbar.update(1)
+
+
+        if batch_idx % args.log_interval == 0:
+            for save_layer_number in range(args.save_layer_train):
+                save_image(primary_color_layers[save_layer_number,:,:,:,:],
+                       'results/%s/train_ep_' % args.run_name + str(epoch) + '_ln_%02d_primary_color_layers.png' % save_layer_number)
+                save_image(reconst_img[save_layer_number,:,:,:].unsqueeze(0),
+                       'results/%s/train_ep_' % args.run_name + str(epoch) + '_ln_%02d_reconst_img.png' % save_layer_number)
+                save_image(target_img[save_layer_number,:,:,:].unsqueeze(0),
+                       'results/%s/train_ep_' % args.run_name + str(epoch) + '_ln_%02d_target_img.png' % save_layer_number)
+                
+        
+    pbar.close()
 
     return OrderedDict([('loss', avg_meters['loss'].avg), ('dice', avg_meters['dice'].avg),('min_train_loss',min_train_loss)])
 
@@ -423,10 +530,11 @@ def val(epoch,min_val_loss):
         m_loss_mean = 0
         s_loss_mean = 0
         d_loss_mean = 0
+        batch_num = 0
 
-        pbar = tqdm(total=len(val_loader))
+        pbar = tqdm(total=len(val_after_loader))
 
-        for batch_idx, (target_img, primary_color_layers,mask,img_365, primary_color_layers_365) in enumerate(val_loader):
+        for batch_idx, (target_img, primary_color_layers,mask ) in enumerate(val_after_loader):
             target_img = target_img.to(device) # bn, 3ch, h, w
             primary_color_layers = primary_color_layers.to(device)
             mask = mask.to(device)
@@ -450,6 +558,7 @@ def val(epoch,min_val_loss):
             #print('total_loss: ', total_loss)
             d_loss = squared_mahalanobis_distance_loss(primary_color_layers.detach(), processed_alpha_layers, pred_unmixed_rgb_layers) * args.distance_loss_lambda
 
+            batch_num += 1
             total_loss = r_loss + m_loss + s_loss + d_loss
             val_loss += total_loss.item()
             r_loss_mean += r_loss.item()
@@ -467,8 +576,10 @@ def val(epoch,min_val_loss):
                 save_image(target_img[save_layer_number,:,:,:].unsqueeze(0),
                     'results/%s/val_ep_' % args.run_name + str(epoch) + '_idx_%02d_target_img.png' % batch_idx)
 
-            processed_alpha_layers = torch.squeeze(processed_alpha_layers,dim=2)
-            output = model(torch.cat((target_img,processed_alpha_layers[:,:4,:,:]),1),processed_alpha_layers)
+            
+            processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
+            output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
+            # output = model(target_img.detach())
 
             loss = criterion(output, mask)
             dice = dice_coef(output, mask)
@@ -485,11 +596,11 @@ def val(epoch,min_val_loss):
 
         pbar.close()
 
-        val_loss = val_loss / len(val_loader.dataset)
-        r_loss_mean = r_loss_mean / len(val_loader.dataset)
-        m_loss_mean = m_loss_mean / len(val_loader.dataset)
-        s_loss_mean = s_loss_mean / len(val_loader.dataset)
-        d_loss_mean = d_loss_mean / len(val_loader.dataset)
+        val_loss = val_loss / batch_num
+        r_loss_mean = r_loss_mean / batch_num
+        m_loss_mean = m_loss_mean / batch_num
+        s_loss_mean = s_loss_mean / batch_num
+        d_loss_mean = d_loss_mean / batch_num
 
         print('====> Epoch: {} Average val loss: {:.6f}'.format(epoch, val_loss ))
         print('====> Epoch: {} Average val reconst_loss *lambda: {:.6f}'.format(epoch, r_loss_mean ))
@@ -502,6 +613,58 @@ def val(epoch,min_val_loss):
         
         if (val_loss < min_val_loss):
             min_val_loss = val_loss
+
+        return OrderedDict([('loss', avg_meters['loss'].avg), ('dice', avg_meters['dice'].avg),('min_val_loss',min_val_loss)])
+
+
+def val_after_finish_color_seg(epoch,min_val_loss):
+    avg_meters = {'loss': AverageMeter(),
+                  'dice': AverageMeter()}  # iou
+
+    mask_generator.eval()
+    residue_predictor.eval()
+    model.eval()
+
+    with torch.no_grad():
+
+        pbar = tqdm(total=len(val_after_loader))
+
+        for batch_idx, (target_img, primary_color_layers,mask ) in enumerate(val_after_loader):
+            target_img = target_img.to(device) # bn, 3ch, h, w
+            primary_color_layers = primary_color_layers.to(device)
+            mask = mask.to(device)
+
+            primary_color_pack = primary_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+            pred_alpha_layers_pack = mask_generator(target_img, primary_color_pack)
+            pred_alpha_layers = pred_alpha_layers_pack.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
+            processed_alpha_layers = alpha_normalize(pred_alpha_layers)
+            mono_color_layers = torch.cat((primary_color_layers, processed_alpha_layers), 2) #shape: bn, ln, 4, h, w
+            mono_color_layers_pack = mono_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+            residue_pack  = residue_predictor(target_img, mono_color_layers_pack)
+            residue = residue_pack.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
+            pred_unmixed_rgb_layers = torch.clamp((primary_color_layers + residue), min=0., max=1.0)
+            reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
+            mono_color_reconst_img = (primary_color_layers * processed_alpha_layers).sum(dim=1)
+
+            # output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:28,:,:]),1),mono_color_layers_pack.detach())
+            processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
+            output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
+            # output = model(target_img.detach())
+
+            loss = criterion(output, mask)
+            dice = dice_coef(output, mask)
+            avg_meters['loss'].update(loss.item(), target_img.size(0))
+            avg_meters['dice'].update(dice, target_img.size(0))
+            
+            postfix = OrderedDict([
+                ('loss', avg_meters['loss'].avg),
+                ('dice', avg_meters['dice'].avg),
+                #('iou', avg_meters['iou'].avg),
+            ])
+            pbar.set_postfix(postfix)
+            pbar.update(1)
+
+        pbar.close()
 
         return OrderedDict([('loss', avg_meters['loss'].avg), ('dice', avg_meters['dice'].avg),('min_val_loss',min_val_loss)])
 
@@ -523,18 +686,35 @@ if __name__ == "__main__":
     trigger = 0
     os.makedirs('models/%s' % config['name'], exist_ok=True)
 
+    load_flag = 0
+    train_all_flag = 1
+    path_mask_generator = 'results/train/mask_generator.pth'
+    path_residue_predictor = 'results/train/residue_predictor.pth'
+
 
     for epoch in range(1, args.epochs + 1):
         print('Start training')
-        train_log = train(epoch,min_train_loss)
 
-        if (train_log['min_train_loss']== -1):
-            break
+        if train_all_flag == 1:
+            train_log = train(epoch,min_train_loss)
+            # train_log = train_after_finish_color_seg(epoch, min_train_loss)
+            if (train_log['min_train_loss'] == -1):
+                train_all_flag = 0
+        else:
+            train_log = train_after_finish_color_seg(epoch, min_train_loss)
 
-        val_log = val(epoch,min_val_loss)
+        if (load_flag == 0 and train_all_flag == 0):
+            load_flag = 1
+            mask_generator.load_state_dict(torch.load(path_mask_generator))
+            residue_predictor.load_state_dict(torch.load(path_residue_predictor))
+        
+        if train_all_flag == 1:
+            val_log = val(epoch,min_val_loss)
+        else:
+            val_log = val_after_finish_color_seg(epoch, min_val_loss)
 
-        # if config['scheduler'] == 'CosineAnnealingLR':
-        #     scheduler.step()
+        if config['scheduler'] == 'CosineAnnealingLR':
+            scheduler.step()
 
         print('loss %.4f - dice %.4f - val_loss %.4f - val_dice %.4f'
               % (train_log['loss'], train_log['dice'], val_log['loss'], val_log['dice']))
