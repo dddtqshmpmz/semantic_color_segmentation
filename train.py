@@ -49,7 +49,7 @@ parser.add_argument('--run_name', type=str, default='train', help='run-name. Thi
 parser.add_argument('--batch_size', type=int, default=20, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
 
-parser.add_argument('--after_batch_size', type=int, default=32, metavar='N',  ## 32-> 4
+parser.add_argument('--after_batch_size', type=int, default= 30, metavar='N',  ## 32-> 4
                     help='input batch size for training after color model complete (default: 32)')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')
@@ -221,7 +221,7 @@ optimizer = optim.Adam(params, lr=config['color_lr'], betas=(0.0, 0.99)) # 0926
 
 
 # 加载新参数
-model = smp.UnetWithColor('efficientnet-b3', in_channels= 3+7 ,
+model = smp.UnetWithColor('efficientnet-b3', in_channels= 3+28 ,
                      classes= 1, encoder_weights='imagenet').cuda()
 model = model.cuda()
 model= nn.DataParallel(model,device_ids=[0,1,2,3])
@@ -357,8 +357,8 @@ def train(epoch,min_train_loss):
         d_loss_mean += d_loss.item()
 
 
-        processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
-        output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
+        # processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
+        output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:,:,:]),1),mono_color_layers_pack.detach())
         # output = model(target_img.detach())
         loss = criterion(output, mask)
         dice = dice_coef(output, mask)
@@ -477,8 +477,9 @@ def train_after_finish_color_seg(epoch,min_train_loss):
         mono_color_reconst_img = (primary_color_layers * processed_alpha_layers).sum(dim=1)
 
         
-        processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
-        output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
+        # processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
+        output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:,:,:]),1),mono_color_layers_pack.detach())
+        # output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
         # output = model(target_img.detach())
         loss = criterion(output, mask)
         dice = dice_coef(output, mask)
@@ -577,8 +578,9 @@ def val(epoch,min_val_loss):
                     'results/%s/val_ep_' % args.run_name + str(epoch) + '_idx_%02d_target_img.png' % batch_idx)
 
             
-            processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
-            output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
+            # processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
+            output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:,:,:]),1),mono_color_layers_pack.detach())
+            # output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
             # output = model(target_img.detach())
 
             loss = criterion(output, mask)
@@ -647,8 +649,9 @@ def val_after_finish_color_seg(epoch,min_val_loss):
             mono_color_reconst_img = (primary_color_layers * processed_alpha_layers).sum(dim=1)
 
             # output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:28,:,:]),1),mono_color_layers_pack.detach())
-            processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
-            output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
+            # processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
+            output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:,:,:]),1),mono_color_layers_pack.detach())
+            # output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
             # output = model(target_img.detach())
 
             loss = criterion(output, mask)
