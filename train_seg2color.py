@@ -49,7 +49,7 @@ parser.add_argument('--run_name', type=str, default='train', help='run-name. Thi
 parser.add_argument('--batch_size', type=int, default=20, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
 
-parser.add_argument('--after_batch_size', type=int, default= 28, metavar='N',  ## 32-> 4
+parser.add_argument('--after_batch_size', type=int, default= 30, metavar='N',  ## 32-> 4
                     help='input batch size for training after color model complete (default: 32)')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')

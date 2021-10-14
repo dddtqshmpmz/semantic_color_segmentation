@@ -1,1 +1,223 @@
 Start training
+
+Train Epoch: 1 [0/24000 (0%)]	Loss: 0.024589
+reconst_loss *lambda:  0.009913972020149231
+squared_mahalanobis_distance_loss *lambda:  0.007888182252645492
+
+Train Epoch: 1 [2000/24000 (8%)]	Loss: 0.010521
+reconst_loss *lambda:  0.004689745604991913
+squared_mahalanobis_distance_loss *lambda:  0.0006669130176305771
+
+Train Epoch: 1 [4000/24000 (17%)]	Loss: 0.007802
+reconst_loss *lambda:  0.003591270372271538
+squared_mahalanobis_distance_loss *lambda:  0.00030649418476969004
+
+Train Epoch: 1 [6000/24000 (25%)]	Loss: 0.005522
+reconst_loss *lambda:  0.002608004771173
+squared_mahalanobis_distance_loss *lambda:  0.00013164879055693746
+
+Train Epoch: 1 [8000/24000 (33%)]	Loss: 0.004638
+reconst_loss *lambda:  0.002005240134894848
+squared_mahalanobis_distance_loss *lambda:  0.00014893513871356846
+
+Train Epoch: 1 [10000/24000 (42%)]	Loss: 0.005131
+reconst_loss *lambda:  0.0023585082963109016
+squared_mahalanobis_distance_loss *lambda:  0.00012429567286744713
+
+Train Epoch: 1 [12000/24000 (50%)]	Loss: 0.004680
+reconst_loss *lambda:  0.0022366892546415327
+squared_mahalanobis_distance_loss *lambda:  8.519888506270945e-05
+
+Train Epoch: 1 [14000/24000 (58%)]	Loss: 0.004385
+reconst_loss *lambda:  0.002012444473803043
+squared_mahalanobis_distance_loss *lambda:  0.00017376415198668837
+
+Train Epoch: 1 [16000/24000 (67%)]	Loss: 0.004508
+reconst_loss *lambda:  0.0020218802616000175
+squared_mahalanobis_distance_loss *lambda:  8.280467009171843e-05
+
+Train Epoch: 1 [18000/24000 (75%)]	Loss: 0.005771
+reconst_loss *lambda:  0.002767433598637581
+squared_mahalanobis_distance_loss *lambda:  9.754862985573709e-05
+
+Train Epoch: 1 [20000/24000 (83%)]	Loss: 0.004361
+reconst_loss *lambda:  0.0020502468571066855
+squared_mahalanobis_distance_loss *lambda:  7.963721873238683e-05
+
+Train Epoch: 1 [22000/24000 (92%)]	Loss: 0.005337
+reconst_loss *lambda:  0.00253563541918993
+squared_mahalanobis_distance_loss *lambda:  0.00019200012320652604
+====> Epoch: 1 Average loss: 0.117236
+====> Epoch: 1 Average reconst_loss *lambda: 0.053882
+====> Epoch: 1 Average mono_loss *lambda: 0.059156
+====> Epoch: 1 Average squared_mahalanobis_distance_loss *lambda: 0.004198
+====> Epoch: 1 Average val loss: 0.084088
+====> Epoch: 1 Average val reconst_loss *lambda: 0.037933
+====> Epoch: 1 Average val mono_loss *lambda: 0.044903
+====> Epoch: 1 Average val sparse_loss *lambda: 0.000000
+====> Epoch: 1 Average val squared_mahalanobis_distance_loss *lambda: 0.001252
+loss 0.6805 - dice 0.7338 - val_loss 0.6131 - val_dice 0.7760
+=> saved best model
+Start training
+
+Train Epoch: 2 [0/24000 (0%)]	Loss: 0.004840
+reconst_loss *lambda:  0.0023287344723939896
+squared_mahalanobis_distance_loss *lambda:  6.778547540307046e-05
+
+Train Epoch: 2 [2000/24000 (8%)]	Loss: 0.004427
+reconst_loss *lambda:  0.0021018974483013155
+squared_mahalanobis_distance_loss *lambda:  5.4321420611813666e-05
+
+Train Epoch: 2 [4000/24000 (17%)]	Loss: 0.003903
+reconst_loss *lambda:  0.001811313070356846
+squared_mahalanobis_distance_loss *lambda:  0.0001027373829856515
+
+Train Epoch: 2 [6000/24000 (25%)]	Loss: 0.004016
+reconst_loss *lambda:  0.0018813196569681168
+squared_mahalanobis_distance_loss *lambda:  5.938664544373751e-05
+
+Train Epoch: 2 [8000/24000 (33%)]	Loss: 0.003030
+reconst_loss *lambda:  0.0012819413095712662
+squared_mahalanobis_distance_loss *lambda:  7.600283715873957e-05
+
+Train Epoch: 2 [10000/24000 (42%)]	Loss: 0.003879
+reconst_loss *lambda:  0.0017360685393214225
+squared_mahalanobis_distance_loss *lambda:  0.00010153515031561256
+
+Train Epoch: 2 [12000/24000 (50%)]	Loss: 0.004536
+reconst_loss *lambda:  0.0021027194336056708
+squared_mahalanobis_distance_loss *lambda:  6.49346795398742e-05
+
+Train Epoch: 2 [14000/24000 (58%)]	Loss: 0.002468
+reconst_loss *lambda:  0.0011149312369525433
+squared_mahalanobis_distance_loss *lambda:  5.238412995822728e-05
+
+Train Epoch: 2 [16000/24000 (67%)]	Loss: 0.003463
+reconst_loss *lambda:  0.0015949849039316177
+squared_mahalanobis_distance_loss *lambda:  4.59475297247991e-05
+
+Train Epoch: 2 [18000/24000 (75%)]	Loss: 0.002874
+reconst_loss *lambda:  0.0011567781679332257
+squared_mahalanobis_distance_loss *lambda:  0.00010009721154347062
+
+Train Epoch: 2 [20000/24000 (83%)]	Loss: 0.002798
+reconst_loss *lambda:  0.0012654642574489116
+squared_mahalanobis_distance_loss *lambda:  7.526454282924533e-05
+
+Train Epoch: 2 [22000/24000 (92%)]	Loss: 0.002716
+reconst_loss *lambda:  0.0011231406591832639
+squared_mahalanobis_distance_loss *lambda:  7.22144148312509e-05
+====> Epoch: 2 Average loss: 0.068864
+====> Epoch: 2 Average reconst_loss *lambda: 0.030928
+====> Epoch: 2 Average mono_loss *lambda: 0.036531
+====> Epoch: 2 Average squared_mahalanobis_distance_loss *lambda: 0.001406
+====> Epoch: 2 Average val loss: 0.060693
+====> Epoch: 2 Average val reconst_loss *lambda: 0.026150
+====> Epoch: 2 Average val mono_loss *lambda: 0.033518
+====> Epoch: 2 Average val sparse_loss *lambda: 0.000000
+====> Epoch: 2 Average val squared_mahalanobis_distance_loss *lambda: 0.001025
+loss 0.6037 - dice 0.7880 - val_loss 0.6370 - val_dice 0.7676
+Start training
+
+Train Epoch: 3 [0/24000 (0%)]	Loss: 0.003554
+reconst_loss *lambda:  0.001623493991792202
+squared_mahalanobis_distance_loss *lambda:  5.310853011906147e-05
+
+Train Epoch: 3 [2000/24000 (8%)]	Loss: 0.002346
+reconst_loss *lambda:  0.00100242979824543
+squared_mahalanobis_distance_loss *lambda:  5.909730680286884e-05
+
+Train Epoch: 3 [4000/24000 (17%)]	Loss: 0.003841
+reconst_loss *lambda:  0.0017291085794568061
+squared_mahalanobis_distance_loss *lambda:  7.468839758075773e-05
+
+Train Epoch: 3 [6000/24000 (25%)]	Loss: 0.004145
+reconst_loss *lambda:  0.0019493915140628814
+squared_mahalanobis_distance_loss *lambda:  5.0311069935560225e-05
+
+Train Epoch: 3 [8000/24000 (33%)]	Loss: 0.002797
+reconst_loss *lambda:  0.0012366159819066525
+squared_mahalanobis_distance_loss *lambda:  5.047526210546494e-05
+
+Train Epoch: 3 [10000/24000 (42%)]	Loss: 0.004372
+reconst_loss *lambda:  0.00204850472509861
+squared_mahalanobis_distance_loss *lambda:  5.6023563956841826e-05
+
+Train Epoch: 3 [12000/24000 (50%)]	Loss: 0.003803
+reconst_loss *lambda:  0.001774141564965248
+squared_mahalanobis_distance_loss *lambda:  6.628489936701953e-05
+
+Train Epoch: 3 [14000/24000 (58%)]	Loss: 0.003056
+reconst_loss *lambda:  0.0013654783368110656
+squared_mahalanobis_distance_loss *lambda:  4.9116567242890594e-05
+
+Train Epoch: 3 [16000/24000 (67%)]	Loss: 0.003933
+reconst_loss *lambda:  0.0018660567700862884
+squared_mahalanobis_distance_loss *lambda:  4.403181374073029e-05
+
+Train Epoch: 3 [18000/24000 (75%)]	Loss: 0.002268
+reconst_loss *lambda:  0.000966466125100851
+squared_mahalanobis_distance_loss *lambda:  4.340558953117579e-05
+
+Train Epoch: 3 [20000/24000 (83%)]	Loss: 0.004596
+reconst_loss *lambda:  0.002137083746492863
+squared_mahalanobis_distance_loss *lambda:  6.14539661910385e-05
+
+Train Epoch: 3 [22000/24000 (92%)]	Loss: 0.002626
+reconst_loss *lambda:  0.0010807466693222522
+squared_mahalanobis_distance_loss *lambda:  6.865339237265289e-05
+====> Epoch: 3 Average loss: 0.061114
+====> Epoch: 3 Average reconst_loss *lambda: 0.027008
+====> Epoch: 3 Average mono_loss *lambda: 0.032934
+====> Epoch: 3 Average squared_mahalanobis_distance_loss *lambda: 0.001172
+====> Epoch: 3 Average val loss: 0.068206
+====> Epoch: 3 Average val reconst_loss *lambda: 0.031263
+====> Epoch: 3 Average val mono_loss *lambda: 0.036137
+====> Epoch: 3 Average val sparse_loss *lambda: 0.000000
+====> Epoch: 3 Average val squared_mahalanobis_distance_loss *lambda: 0.000806
+loss 0.5806 - dice 0.8041 - val_loss 0.5658 - val_dice 0.8163
+=> saved best model
+Start training
+
+Train Epoch: 4 [0/24000 (0%)]	Loss: 0.004211
+reconst_loss *lambda:  0.001982131414115429
+squared_mahalanobis_distance_loss *lambda:  4.676490789279342e-05
+
+Train Epoch: 4 [2000/24000 (8%)]	Loss: 0.002888
+reconst_loss *lambda:  0.0012469065375626087
+squared_mahalanobis_distance_loss *lambda:  5.795522010885179e-05
+
+Train Epoch: 4 [4000/24000 (17%)]	Loss: 0.002608
+reconst_loss *lambda:  0.0012352832593023777
+squared_mahalanobis_distance_loss *lambda:  0.00012198996264487506
+====> Epoch: 4 Average loss: 0.057726
+====> Epoch: 4 Average reconst_loss *lambda: 0.025321
+====> Epoch: 4 Average mono_loss *lambda: 0.031210
+====> Epoch: 4 Average squared_mahalanobis_distance_loss *lambda: 0.001195
+loss 0.5628 - dice 0.8173 - val_loss 0.5820 - val_dice 0.8073
+Start training
+loss 0.5416 - dice 0.8302 - val_loss 0.5350 - val_dice 0.8416
+=> saved best model
+Start training
+loss 0.5378 - dice 0.8319 - val_loss 0.5341 - val_dice 0.8388
+Start training
+loss 0.5329 - dice 0.8347 - val_loss 0.5596 - val_dice 0.8086
+Start training
+loss 0.5271 - dice 0.8381 - val_loss 0.5472 - val_dice 0.8373
+Start training
+loss 0.5252 - dice 0.8388 - val_loss 0.5494 - val_dice 0.8207
+Start training
+loss 0.5183 - dice 0.8438 - val_loss 0.5264 - val_dice 0.8460
+=> saved model every 10 epochs
+=> saved best model
+Start training
+loss 0.5154 - dice 0.8450 - val_loss 0.5234 - val_dice 0.8450
+Start training
+loss 0.5128 - dice 0.8464 - val_loss 0.5179 - val_dice 0.8472
+=> saved best model
+Start training
+loss 0.5069 - dice 0.8500 - val_loss 0.4976 - val_dice 0.8566
+=> saved best model
+Start training
+loss 0.5062 - dice 0.8495 - val_loss 0.5114 - val_dice 0.8525
+Start training
