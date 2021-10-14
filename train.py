@@ -337,6 +337,8 @@ def train(epoch,min_train_loss):
         residue = residue_pack.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
         #pred_unmixed_rgb_layers = mono_color_layers + residue * processed_alpha_layers
         pred_unmixed_rgb_layers = torch.clamp((primary_color_layers + residue), min=0., max=1.0)# * processed_alpha_layers
+        mixed_rgb_color_layers = torch.cat((pred_unmixed_rgb_layers, processed_alpha_layers), 2)
+        mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
 
         # alpha addしてreconst_imgを作成する
         #reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
@@ -358,7 +360,7 @@ def train(epoch,min_train_loss):
 
 
         # processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
-        output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:,:,:]),1),mono_color_layers_pack.detach())
+        output = model(torch.cat((target_img.detach(),mixed_rgb_color_layers_pack.detach()),1),mixed_rgb_color_layers_pack.detach())
         # output = model(target_img.detach())
         loss = criterion(output, mask)
         dice = dice_coef(output, mask)
@@ -470,6 +472,9 @@ def train_after_finish_color_seg(epoch,min_train_loss):
         residue = residue_pack.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
         #pred_unmixed_rgb_layers = mono_color_layers + residue * processed_alpha_layers
         pred_unmixed_rgb_layers = torch.clamp((primary_color_layers + residue), min=0., max=1.0)# * processed_alpha_layers
+        mixed_rgb_color_layers = torch.cat((pred_unmixed_rgb_layers, processed_alpha_layers), 2)
+        mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+
 
         # alpha addしてreconst_imgを作成する
         #reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
@@ -478,7 +483,7 @@ def train_after_finish_color_seg(epoch,min_train_loss):
 
         
         # processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
-        output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:,:,:]),1),mono_color_layers_pack.detach())
+        output = model(torch.cat((target_img.detach(),mixed_rgb_color_layers_pack.detach()),1),mixed_rgb_color_layers_pack.detach())
         # output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
         # output = model(target_img.detach())
         loss = criterion(output, mask)
@@ -549,6 +554,10 @@ def val(epoch,min_val_loss):
             residue_pack  = residue_predictor(target_img, mono_color_layers_pack)
             residue = residue_pack.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
             pred_unmixed_rgb_layers = torch.clamp((primary_color_layers + residue), min=0., max=1.0)
+            mixed_rgb_color_layers = torch.cat((pred_unmixed_rgb_layers, processed_alpha_layers), 2)
+            mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+
+
             reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
             mono_color_reconst_img = (primary_color_layers * processed_alpha_layers).sum(dim=1)
 
@@ -579,7 +588,7 @@ def val(epoch,min_val_loss):
 
             
             # processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
-            output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:,:,:]),1),mono_color_layers_pack.detach())
+            output = model(torch.cat((target_img.detach(),mixed_rgb_color_layers_pack.detach()),1),mixed_rgb_color_layers_pack.detach())
             # output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
             # output = model(target_img.detach())
 
@@ -645,12 +654,15 @@ def val_after_finish_color_seg(epoch,min_val_loss):
             residue_pack  = residue_predictor(target_img, mono_color_layers_pack)
             residue = residue_pack.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
             pred_unmixed_rgb_layers = torch.clamp((primary_color_layers + residue), min=0., max=1.0)
+            mixed_rgb_color_layers = torch.cat((pred_unmixed_rgb_layers, processed_alpha_layers), 2)
+            mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+
             reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
             mono_color_reconst_img = (primary_color_layers * processed_alpha_layers).sum(dim=1)
 
             # output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:28,:,:]),1),mono_color_layers_pack.detach())
             # processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
-            output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:,:,:]),1),mono_color_layers_pack.detach())
+            output = model(torch.cat((target_img.detach(),mixed_rgb_color_layers_pack.detach()),1),mixed_rgb_color_layers_pack.detach())
             # output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
             # output = model(target_img.detach())
 
