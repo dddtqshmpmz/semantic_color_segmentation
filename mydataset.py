@@ -49,6 +49,9 @@ class MyDataset(Dataset):
             self.imgs_path = np.array(pd.read_csv(csv_path_test, header=None)).reshape(-1)
             self.palette_list = np.array(pd.read_csv('palette_%d_%s' % (num_primary_color, csv_path_test), header=None)).reshape(-1, num_primary_color*3)
             self.imgs_path = np.array( [x.replace('train','train_IHC')  for x in self.imgs_path] )
+
+            self.imgs_path = np.array( [x.replace('../','../FSCS/')  for x in self.imgs_path] )
+
         self.num_primary_color = num_primary_color
 
     def __getitem__(self, index):
@@ -91,24 +94,24 @@ class MyDatasetIHC(Dataset):
         if mode == 'train':
             self.imgs_path = np.array(pd.read_csv(csv_path_ihc, header=None)).reshape(-1)[:ihc_num] #csvリストの後ろをvaldataに
             self.palette_list = np.array(pd.read_csv('palette_%d_%s' % (num_primary_color, csv_path_ihc), header=None)).reshape(-1, num_primary_color*3)[:ihc_num]
-            self.masks_path =  np.array(pd.read_csv(csv_path_ihc, header=None)).reshape(-1)[:ihc_num]
+            # self.masks_path =  np.array(pd.read_csv(csv_path_ihc, header=None)).reshape(-1)[:ihc_num]
 
-            self.masks_path = np.array( [x.replace('images_10pics_30k_patches','masks_10pics_30k_patches')  for x in self.imgs_path] )
+            # self.masks_path = np.array( [x.replace('images_10pics_30k_patches','masks_10pics_30k_patches')  for x in self.imgs_path] )
 
         
         if mode == 'val':
             self.imgs_path = np.array(pd.read_csv(csv_path_ihc, header=None)).reshape(-1)[ihc_num:] #csvリストの後ろをvaldataに
             self.palette_list = np.array(pd.read_csv('palette_%d_%s' % (num_primary_color, csv_path_ihc), header=None)).reshape(-1, num_primary_color*3)[ihc_num:]
-            self.masks_path =  np.array(pd.read_csv(csv_path_ihc, header=None)).reshape(-1)[ihc_num:]
+            # self.masks_path =  np.array(pd.read_csv(csv_path_ihc, header=None)).reshape(-1)[ihc_num:]
             
-            self.masks_path = np.array( [x.replace('images_10pics_30k_patches','masks_10pics_30k_patches')  for x in self.imgs_path] )
+            # self.masks_path = np.array( [x.replace('images_10pics_30k_patches','masks_10pics_30k_patches')  for x in self.imgs_path] )
 
 
         self.num_primary_color = num_primary_color
 
     def __getitem__(self, index):
         img = cv2.imread(self.imgs_path[index])
-        mask = cv2.imread(self.masks_path[index],cv2.IMREAD_GRAYSCALE)
+        # mask = cv2.imread(self.masks_path[index],cv2.IMREAD_GRAYSCALE)
  
         target_size = 320
         img = cv2.resize(img, (target_size, target_size), interpolation=cv2.INTER_LINEAR)
@@ -117,10 +120,10 @@ class MyDatasetIHC(Dataset):
         target_img = img/255 # 0~1
 
 
-        mask = cv2.resize(mask, (target_size, target_size), interpolation=cv2.INTER_LINEAR)
-        mask = np.expand_dims(mask, 2)
-        mask = mask.transpose((2,0,1)) # h,w,c -> c,h,w
-        mask = mask/255 # 0~1
+        # mask = cv2.resize(mask, (target_size, target_size), interpolation=cv2.INTER_LINEAR)
+        # mask = np.expand_dims(mask, 2)
+        # mask = mask.transpose((2,0,1)) # h,w,c -> c,h,w
+        # mask = mask/255 # 0~1
 
         # select primary_color
         primary_color_layers = self.make_primary_color_layers(self.palette_list[index], target_img)
@@ -128,9 +131,9 @@ class MyDatasetIHC(Dataset):
         # to Tensor
         target_img = torch.from_numpy(target_img.astype(np.float32))
         primary_color_layers = torch.from_numpy(primary_color_layers.astype(np.float32))
-        mask = torch.from_numpy(mask.astype(np.float32))
+        # mask = torch.from_numpy(mask.astype(np.float32))
 
-        return target_img, primary_color_layers, mask  # return torch.Tensor
+        return target_img, primary_color_layers  #, mask   # return torch.Tensor
 
     def __len__(self):
         return len(self.imgs_path)

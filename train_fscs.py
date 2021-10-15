@@ -11,19 +11,20 @@ from torchvision import datasets, transforms
 import torch.backends.cudnn as cudnn
 from torchvision.utils import save_image
 from net import MaskGenerator, ResiduePredictor
-from mydataset import MyDataset
+from mydataset import MyDataset, MyDatasetIHC
 import pytorch_ssim
 import cv2
 import os
 import sys
+from tqdm import tqdm
 from util import psnr,ssim,reconst_loss,temp_distance,squared_mahalanobis_distance_loss,alpha_normalize,mono_color_reconst_loss
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2'
 
 parser = argparse.ArgumentParser(description='baseline')
 parser.add_argument('--run_name', type=str, default='train', help='run-name. This name is used for output folder.')
-parser.add_argument('--batch_size', type=int, default=64, metavar='N',  ## 32-> 4
+parser.add_argument('--batch_size', type=int, default=18, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
-parser.add_argument('--epochs', type=int, default=50, metavar='N', ## 10
+parser.add_argument('--epochs', type=int, default=100, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--no_cuda', action='store_true', default=False,
                     help='enables CUDA training')
@@ -48,7 +49,7 @@ parser.add_argument('--save_layer_train', type=int, default=1,
 parser.add_argument('--num_workers', type=int, default=8,
                     help='num_workers of dataloader')
 parser.add_argument('--csv_path', type=str, default='train.csv', help='path to csv of images path') # sample / places
-parser.add_argument('--csv_path_ihc', type=str, default='train_IHC_256_2w.csv', help='path to ihc_256 dataset csv of images path')
+parser.add_argument('--csv_path_ihc', type=str, default='ihc_30k.csv', help='path to ihc_256 dataset csv of images path')
 parser.add_argument('--csv_path_test',type=str, default='train_IHC.csv', help='path to test ihc csv of images path')
 
 parser.add_argument('--log_interval', type=int, default=100, metavar='N', ## 200-> 20 ->30 
@@ -65,13 +66,13 @@ except OSError:
 
 # 打印所有数据到日志
 log = open("train_process.log", "a")
-sys.stdout = sys.__stdout__ # log
+sys.stdout = log # log  sys.__stdout__
 torch.manual_seed(args.seed)
 cudnn.benchmark = True
 
 device = torch.device("cuda" if args.cuda else "cpu")
 
-train_dataset = MyDataset(args.csv_path, args.csv_path_ihc, args.csv_path_test ,args.num_primary_color, mode='train')
+train_dataset = MyDatasetIHC(args.csv_path_ihc, args.num_primary_color, mode='train')
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=args.batch_size,
@@ -83,12 +84,13 @@ train_loader = torch.utils.data.DataLoader(
     )
 
 
-val_dataset = MyDataset(args.csv_path, args.csv_path_ihc,args.csv_path_test , args.num_primary_color, mode='val')
+val_dataset = MyDatasetIHC(args.csv_path_ihc, args.num_primary_color, mode='val')
 val_loader = torch.utils.data.DataLoader(
     val_dataset,
-    batch_size=1,
+    batch_size=args.batch_size,
     shuffle=False,
-    num_workers=1,
+    num_workers=args.num_workers,
+    drop_last=True
     )
 
 mask_generator = MaskGenerator(args.num_primary_color).to(device)
@@ -103,7 +105,7 @@ params = list(mask_generator.parameters())
 params += list(residue_predictor.parameters())
 
 
-optimizer = optim.Adam(params, lr=1e-3, betas=(0.0, 0.99)) # 1e-3 -> 0.2
+optimizer = optim.Adam(params, lr=5e-4, betas=(0.0, 0.99)) # 1e-3 -> 0.2
 
 def sparse_loss(alpha_layers):
     # alpha_layers: bn, ln, 1, h, w
@@ -119,10 +121,11 @@ def train(epoch,min_train_loss):
     train_loss = 0
     r_loss_mean = 0
     m_loss_mean = 0
-    s_loss_mean = 0
+    # s_loss_mean = 0
     d_loss_mean = 0
     batch_num = 0
 
+    pbar = tqdm(total=len(train_loader))
     for batch_idx, (target_img, primary_color_layers) in enumerate(train_loader):
         target_img = target_img.to(device) # bn, 3ch, h, w
         primary_color_layers = primary_color_layers.to(device)
@@ -161,11 +164,11 @@ def train(epoch,min_train_loss):
         # Culculate loss.
         r_loss = reconst_loss(reconst_img, target_img, type=args.reconst_loss_type) * args.rec_loss_lambda
         m_loss = mono_color_reconst_loss(mono_color_reconst_img, target_img) * args.m_loss_lambda
-        s_loss = sparse_loss(processed_alpha_layers) * args.sparse_loss_lambda
+        # s_loss = sparse_loss(processed_alpha_layers) * args.sparse_loss_lambda
         #print('total_loss: ', total_loss)
         d_loss = squared_mahalanobis_distance_loss(primary_color_layers.detach(), processed_alpha_layers, pred_unmixed_rgb_layers) * args.distance_loss_lambda
 
-        total_loss = r_loss + m_loss + s_loss + d_loss
+        total_loss = r_loss + m_loss + d_loss
 
         if (math.isnan(total_loss.item())):
             print('----------------------------------------- total_loss is nan, continue... -----------------------------------------')
@@ -173,11 +176,13 @@ def train(epoch,min_train_loss):
         
         batch_num += 1
 
+        pbar.update(1)
+
         total_loss.backward()
         train_loss += total_loss.item()
         r_loss_mean += r_loss.item()
         m_loss_mean += m_loss.item()
-        s_loss_mean += s_loss.item()
+        # s_loss_mean += s_loss.item()
         d_loss_mean += d_loss.item()
 
         optimizer.step()
@@ -189,7 +194,7 @@ def train(epoch,min_train_loss):
                 100. * batch_idx / len(train_loader),
                 total_loss.item() / len(target_img)))
             print('reconst_loss *lambda: ', r_loss.item() / len(target_img))
-            print('sparse_loss *lambda: ', s_loss.item() / len(target_img))
+            # print('sparse_loss *lambda: ', s_loss.item() / len(target_img))
             print('squared_mahalanobis_distance_loss *lambda: ', d_loss.item() / len(target_img))
 
 
@@ -201,17 +206,18 @@ def train(epoch,min_train_loss):
                 save_image(target_img[save_layer_number,:,:,:].unsqueeze(0),
                        'results/%s/train_ep_' % args.run_name + str(epoch) + '_ln_%02d_target_img.png' % save_layer_number)
                 
-                
+    pbar.close()
+
     train_loss = train_loss / batch_num
     r_loss_mean = r_loss_mean / batch_num
     m_loss_mean = m_loss_mean / batch_num
-    s_loss_mean = s_loss_mean / batch_num
+    # s_loss_mean = s_loss_mean / batch_num
     d_loss_mean = d_loss_mean / batch_num
 
     print('====> Epoch: {} Average loss: {:.6f}'.format(epoch, train_loss ))
     print('====> Epoch: {} Average reconst_loss *lambda: {:.6f}'.format(epoch, r_loss_mean ))
     print('====> Epoch: {} Average mono_loss *lambda: {:.6f}'.format(epoch, m_loss_mean ))
-    print('====> Epoch: {} Average sparse_loss *lambda: {:.6f}'.format(epoch, s_loss_mean ))
+    # print('====> Epoch: {} Average sparse_loss *lambda: {:.6f}'.format(epoch, s_loss_mean ))
     print('====> Epoch: {} Average squared_mahalanobis_distance_loss *lambda: {:.6f}'.format(epoch, d_loss_mean ))
 
     if (math.isnan(train_loss)):
@@ -235,8 +241,10 @@ def val(epoch):
         val_loss = 0
         r_loss_mean = 0
         m_loss_mean = 0
-        s_loss_mean = 0
+        # s_loss_mean = 0
         d_loss_mean = 0
+
+        pbar = tqdm(total=len(val_loader))
 
         for batch_idx, (target_img, primary_color_layers) in enumerate(val_loader):
             target_img = target_img.to(device) # bn, 3ch, h, w
@@ -257,16 +265,18 @@ def val(epoch):
             # 计算loss 打印出来
             r_loss = reconst_loss(reconst_img, target_img, type=args.reconst_loss_type) * args.rec_loss_lambda
             m_loss = mono_color_reconst_loss(mono_color_reconst_img, target_img) * args.m_loss_lambda
-            s_loss = sparse_loss(processed_alpha_layers) * args.sparse_loss_lambda
+            # s_loss = sparse_loss(processed_alpha_layers) * args.sparse_loss_lambda
             #print('total_loss: ', total_loss)
             d_loss = squared_mahalanobis_distance_loss(primary_color_layers.detach(), processed_alpha_layers, pred_unmixed_rgb_layers) * args.distance_loss_lambda
 
-            total_loss = r_loss + m_loss + s_loss + d_loss
+            total_loss = r_loss + m_loss  + d_loss
             val_loss += total_loss.item()
             r_loss_mean += r_loss.item()
             m_loss_mean += m_loss.item()
-            s_loss_mean += s_loss.item()
+            # s_loss_mean += s_loss.item()
             d_loss_mean += d_loss.item()
+
+            pbar.update(1)
 
             save_layer_number = 0
             if batch_idx <= 1:
@@ -278,17 +288,18 @@ def val(epoch):
                 save_image(target_img[save_layer_number,:,:,:].unsqueeze(0),
                     'results/%s/val_ep_' % args.run_name + str(epoch) + '_idx_%02d_target_img.png' % batch_idx)
 
+        pbar.close()
 
         val_loss = val_loss / len(val_loader.dataset)
         r_loss_mean = r_loss_mean / len(val_loader.dataset)
         m_loss_mean = m_loss_mean / len(val_loader.dataset)
-        s_loss_mean = s_loss_mean / len(val_loader.dataset)
+        # s_loss_mean = s_loss_mean / len(val_loader.dataset)
         d_loss_mean = d_loss_mean / len(val_loader.dataset)
 
         print('====> Epoch: {} Average val loss: {:.6f}'.format(epoch, val_loss ))
         print('====> Epoch: {} Average val reconst_loss *lambda: {:.6f}'.format(epoch, r_loss_mean ))
         print('====> Epoch: {} Average val mono_loss *lambda: {:.6f}'.format(epoch, m_loss_mean ))
-        print('====> Epoch: {} Average val sparse_loss *lambda: {:.6f}'.format(epoch, s_loss_mean ))
+        # print('====> Epoch: {} Average val sparse_loss *lambda: {:.6f}'.format(epoch, s_loss_mean ))
         print('====> Epoch: {} Average val squared_mahalanobis_distance_loss *lambda: {:.6f}'.format(epoch, d_loss_mean ))
 
 

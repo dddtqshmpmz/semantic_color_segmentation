@@ -41,7 +41,7 @@ ARCH_NAMES = archs.__all__
 LOSS_NAMES = losses.__all__
 LOSS_NAMES.append('BCEWithLogitsLoss')
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2'
 
 
 parser = argparse.ArgumentParser(description='baseline')
@@ -49,7 +49,7 @@ parser.add_argument('--run_name', type=str, default='train', help='run-name. Thi
 parser.add_argument('--batch_size', type=int, default=20, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
 
-parser.add_argument('--after_batch_size', type=int, default= 24, metavar='N',  ## 32-> 4
+parser.add_argument('--after_batch_size', type=int, default= 18, metavar='N',  ## 32-> 4
                     help='input batch size for training after color model complete (default: 32)')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')
@@ -233,7 +233,7 @@ optimizer = optim.Adam(params, lr=config['color_lr'], betas=(0.0, 0.99)) # 0926
 model = smp.UnetWithColor('efficientnet-b3', in_channels= 3+7 ,
                      classes= 1, encoder_weights='imagenet').cuda()
 model = model.cuda()
-model= nn.DataParallel(model,device_ids=[0,1,2,3])
+model= nn.DataParallel(model,device_ids=[0,1,2])
 
 
 
@@ -268,11 +268,11 @@ def train(epoch,min_train_loss):
     batch_num = 0
 
     pbar = tqdm(total=len(train_after_loader))
-    for batch_idx, (target_img, primary_color_layers, mask) in enumerate(train_after_loader):
+    for batch_idx, (target_img, primary_color_layers) in enumerate(train_after_loader):
 
         target_img = target_img.to(device) # bn, 3ch, h, w
         primary_color_layers = primary_color_layers.to(device)
-        mask = mask.to(device)
+        # mask = mask.to(device)
 
         optimizer.zero_grad()
 
@@ -375,8 +375,8 @@ def train(epoch,min_train_loss):
     # save best model
     if (train_loss < min_train_loss):
         min_train_loss = train_loss
-        torch.save(mask_generator.state_dict(), 'results/%s/mask_generator.pth' % (args.run_name))
-        torch.save(residue_predictor.state_dict(), 'results/%s/residue_predictor.pth' % args.run_name)
+        torch.save(mask_generator_seg2color.state_dict(), 'results/%s/mask_generator.pth' % (args.run_name))
+        torch.save(residue_predictor_seg2color.state_dict(), 'results/%s/residue_predictor.pth' % args.run_name)
 
     return min_train_loss
 
@@ -401,10 +401,10 @@ def val(epoch,min_val_loss):
 
         pbar = tqdm(total=len(val_after_loader))
 
-        for batch_idx, (target_img, primary_color_layers,mask ) in enumerate(val_after_loader):
+        for batch_idx, (target_img, primary_color_layers  ) in enumerate(val_after_loader):
             target_img = target_img.to(device) # bn, 3ch, h, w
             primary_color_layers = primary_color_layers.to(device)
-            mask = mask.to(device)
+            # mask = mask.to(device)
 
 
             primary_color_pack_old = primary_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3)) 
