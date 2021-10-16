@@ -337,7 +337,7 @@ test_loader = torch.utils.data.DataLoader(
     test_dataset,
     batch_size=1,
     shuffle=False,
-    num_workers=1,
+    num_workers=args.num_workers,
     )
 
 # define model
@@ -407,6 +407,9 @@ with torch.no_grad():
     pbar = tqdm(total=len(test_loader))
 
     for batch_idx, (target_img, primary_color_layers) in enumerate(test_loader):
+        pbar.update(1)
+        if batch_idx < 378: 
+            continue
         print('img #', batch_idx)
 
         target_img = cut_edge(target_img)
@@ -427,9 +430,6 @@ with torch.no_grad():
         pred_alpha_layers_old = pred_alpha_layers_pack_old.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
         processed_alpha_layers_old = alpha_normalize(pred_alpha_layers_old)
 
-        processed_alpha_layers_old = proc_guidedfilter(processed_alpha_layers_old, target_img) # Option
-        processed_alpha_layers_old = alpha_normalize(processed_alpha_layers_old)  # Option
-
         processed_alpha_layers_old = torch.squeeze(processed_alpha_layers_old,dim=2)
         output = model(torch.cat((target_img.detach(),processed_alpha_layers_old.detach()),1),processed_alpha_layers_old.detach())
 
@@ -442,6 +442,9 @@ with torch.no_grad():
 
         # 正規化などのprocessingを行う
         processed_alpha_layers = alpha_normalize(pred_alpha_layers)
+        processed_alpha_layers = proc_guidedfilter(processed_alpha_layers, target_img) # Option
+        processed_alpha_layers = alpha_normalize(processed_alpha_layers)  # Option
+
 
         mono_color_layers = torch.cat((primary_color_layers, processed_alpha_layers), 2) #shape: bn, ln, 4, h, w
         mono_color_layers_pack = mono_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
@@ -486,7 +489,7 @@ with torch.no_grad():
         print('ssim:', ssim_res)
         # print('sparsity:',s_loss)
 
-        pbar.update(1)
+        
 
         if (batch_idx %10 == 0 and True): # 
             img_index = 1
@@ -506,14 +509,14 @@ with torch.no_grad():
            
     pbar.close()
 
-    test_loss = test_loss / len(test_loader.dataset)
-    r_loss_mean = r_loss_mean / len(test_loader.dataset)
-    m_loss_mean = m_loss_mean / len(test_loader.dataset)
-    # s_loss_mean = s_loss_mean / len(test_loader.dataset)
-    d_loss_mean = d_loss_mean / len(test_loader.dataset)
+    test_loss = test_loss / batch_num
+    r_loss_mean = r_loss_mean / batch_num
+    m_loss_mean = m_loss_mean / batch_num
+    # s_loss_mean = s_loss_mean / batch_num
+    d_loss_mean = d_loss_mean / batch_num
     
-    psnr_mean = psnr_mean / len(test_loader.dataset)
-    ssim_mean = ssim_mean / len(test_loader.dataset)
+    psnr_mean = psnr_mean / batch_num
+    ssim_mean = ssim_mean / batch_num
 
     print('====> Average test loss: {:.6f}'.format(test_loss ))
     print('====> Average test reconst_loss *lambda: {:.6f}'.format( r_loss_mean ))
@@ -524,7 +527,7 @@ with torch.no_grad():
     print('====> Average test ssim: {:.6f}'.format( ssim_mean ))
     # print('====> Average test sparse_loss: {:.6f}'.format( s_loss_mean ))
 
-    print('mean_estimation_time: ', mean_estimation_time / len(test_loader.dataset))
+    print('mean_estimation_time: ', mean_estimation_time / batch_num )
     
 
 
