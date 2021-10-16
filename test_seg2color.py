@@ -232,8 +232,8 @@ def cut_edge(target_img):
     #print(target_img.size())
     h = target_img.size(2)
     w = target_img.size(3)
-    h = h - (h % 8)
-    w = w - (w % 8)
+    h = h - (h % 32)
+    w = w - (w % 32)
     target_img = target_img[:,:,:h,:w]
     #print(target_img.size())
     return target_img
@@ -413,20 +413,30 @@ with torch.no_grad():
         target_img = target_img.to(device) # bn, 3ch, h, w
         primary_color_layers = primary_color_layers.to(device)
 
+        primary_color_layers = primary_color_layers.view(primary_color_layers.size(0), -1 , primary_color_layers.size(3), primary_color_layers.size(4))
+        primary_color_layers = cut_edge(primary_color_layers)
+        primary_color_layers = primary_color_layers.view(primary_color_layers.size(0),7,3,primary_color_layers.size(2),primary_color_layers.size(3))
+
+        
         start_time = time.time()
         target_img = target_img.to(device) # bn, 3ch, h, w
 
-        primary_color_pack_old = primary_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3)) 
+        primary_color_pack_old = primary_color_layers.view(primary_color_layers.size(0), -1 , primary_color_layers.size(3), primary_color_layers.size(4))
+
         pred_alpha_layers_pack_old = mask_generator(target_img, primary_color_pack_old)
         pred_alpha_layers_old = pred_alpha_layers_pack_old.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
         processed_alpha_layers_old = alpha_normalize(pred_alpha_layers_old)
+
+        processed_alpha_layers_old = proc_guidedfilter(processed_alpha_layers_old, target_img) # Option
+        processed_alpha_layers_old = alpha_normalize(processed_alpha_layers_old)  # Option
 
         processed_alpha_layers_old = torch.squeeze(processed_alpha_layers_old,dim=2)
         output = model(torch.cat((target_img.detach(),processed_alpha_layers_old.detach()),1),processed_alpha_layers_old.detach())
 
 
         # networkにforwardにする
-        primary_color_pack = primary_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+        primary_color_pack = primary_color_layers.view(primary_color_layers.size(0), -1 , primary_color_layers.size(3), primary_color_layers.size(4))
+
         pred_alpha_layers_pack = mask_generator_seg2color(target_img.detach(), primary_color_pack.detach(),output.detach())
         pred_alpha_layers = pred_alpha_layers_pack.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
 
@@ -476,6 +486,8 @@ with torch.no_grad():
         print('ssim:', ssim_res)
         # print('sparsity:',s_loss)
 
+        pbar.update(1)
+
         if (batch_idx %10 == 0 and True): # 
             img_index = 1
             try:
@@ -492,7 +504,7 @@ with torch.no_grad():
 
             print('Saved to results/%s/test/...' % (run_name))
            
-        
+    pbar.close()
 
     test_loss = test_loss / len(test_loader.dataset)
     r_loss_mean = r_loss_mean / len(test_loader.dataset)
