@@ -475,6 +475,7 @@ with torch.no_grad():
         ssim_res = ssim(reconst_img, target_img)
 
         total_loss = r_loss + m_loss + d_loss
+        print('total_loss', total_loss)
         test_loss += total_loss.item()
         r_loss_mean += r_loss.item()
         m_loss_mean += m_loss.item()
@@ -485,6 +486,8 @@ with torch.no_grad():
         ssim_mean += ssim_res.item()
 
         print('r_loss:', r_loss)
+        print('m_loss:', m_loss)
+        print('d_loss:', d_loss)
         print('psnr:', psnr_res)
         print('ssim:', ssim_res)
         # print('sparsity:',s_loss)
