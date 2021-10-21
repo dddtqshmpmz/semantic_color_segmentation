@@ -75,3 +75,44 @@ def mono_color_reconst_loss(mono_color_reconst_img, target_img):
 
     return loss
 
+
+def delta_E(reconst_img,target_img):
+
+    source = myRGB2Lab(reconst_img)
+    target = myRGB2Lab(target_img.detach())
+    source = source.permute(0,2,3,1).float()
+    source = source.view(source.size(0),-1,3)
+    target = target.permute(0,2,3,1).float()
+    target = target.view(target.size(0),-1,3)
+    delta_e = torch.sqrt( torch.sum( torch.pow(source-target,2), 2) )
+    
+    return delta_e.mean()
+
+
+
+def Fu(X): # X为任意形状的张量
+    FX = 7.787*X + 0.137931
+    index = X > 0.008856
+    FX[index] = torch.pow(X[index],1.0/3.0)
+    return FX
+
+
+def myRGB2Lab(img):# img:[b,3,h,w],[0,1],rgb -> L[0,100],AB[-127,127]
+    X = (0.412453*img[:,0,:,:]+0.357580*img[:,1,:,:]+0.180423*img[:,2,:,:])/0.950456
+    Y = (0.212671*img[:,0,:,:]+0.715160*img[:,1,:,:]+0.072169*img[:,2,:,:])
+    Z = (0.019334*img[:,0,:,:]+0.119193*img[:,1,:,:]+0.950227*img[:,2,:,:])/1.088754
+
+    F_X = Fu(X)
+    F_Y = Fu(Y)
+    F_Z = Fu(Z)
+
+    L = 903.3*Y
+    index = Y > 0.008856
+    L[index] = 116 * F_Y[index] - 16 # [0,100]
+    a = 500*(F_X-F_Y) # [-127,127]
+    b = 200*(F_Y-F_Z) # [-127,127]
+
+    # L = L
+    # a = (a+128.0)
+    # b = (b+128.0)
+    return torch.stack([L, a, b], dim = 1)

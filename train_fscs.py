@@ -5,7 +5,7 @@ import math
 import numpy as np
 import torch
 import torch.utils.data
-from torch import nn, optim
+from torch import le, nn, optim
 from torch.nn import functional as F
 from torchvision import datasets, transforms
 import torch.backends.cudnn as cudnn
@@ -17,12 +17,13 @@ import cv2
 import os
 import sys
 from tqdm import tqdm
-from util import psnr,ssim,reconst_loss,temp_distance,squared_mahalanobis_distance_loss,alpha_normalize,mono_color_reconst_loss
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2'
+import lpips
+from util import psnr,ssim,reconst_loss,temp_distance,squared_mahalanobis_distance_loss,alpha_normalize,mono_color_reconst_loss,delta_E
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 
 parser = argparse.ArgumentParser(description='baseline')
 parser.add_argument('--run_name', type=str, default='train', help='run-name. This name is used for output folder.')
-parser.add_argument('--batch_size', type=int, default=18, metavar='N',  ## 32-> 4
+parser.add_argument('--batch_size', type=int, default=32, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')
@@ -41,6 +42,8 @@ parser.add_argument('--sparse_loss_lambda', type=float, default=0.0, # 1.0
                     help='sparse_loss lambda')
 parser.add_argument('--distance_loss_lambda', type=float, default=0.5, # 1.0 
                     help='distance_loss_lambda')
+parser.add_argument('--lpips_loss_lambda',type=float,default=0.5, 
+                    help='lpips_loss_lambda') 
 
 parser.add_argument('--save_layer_train', type=int, default=1,
                     help='save_layer_train')
@@ -101,6 +104,9 @@ residue_predictor = ResiduePredictor(args.num_primary_color).to(device)
 residue_predictor = nn.DataParallel(residue_predictor)
 residue_predictor = residue_predictor.cuda()
 
+loss_fn_alex  = lpips.LPIPS(net='alex')
+loss_fn_alex = loss_fn_alex.cuda()
+
 params = list(mask_generator.parameters())
 params += list(residue_predictor.parameters())
 
@@ -114,6 +120,13 @@ def sparse_loss(alpha_layers):
     loss = F.l1_loss(alpha_layers, torch.ones_like(alpha_layers).to(device))
     return loss
 
+def im2tensor(image, imtype=np.uint8, cent=1., factor=2.):
+    return (image * factor - cent)
+
+def im2tensor2(image, imtype=np.uint8, cent=1., factor=2.):
+    return ( (image+cent)/factor )
+
+
 def train(epoch,min_train_loss):
     mask_generator.train()
     residue_predictor.train()
@@ -123,6 +136,7 @@ def train(epoch,min_train_loss):
     m_loss_mean = 0
     # s_loss_mean = 0
     d_loss_mean = 0
+    l_loss_mean = 0
     batch_num = 0
 
     pbar = tqdm(total=len(train_loader))
@@ -167,8 +181,13 @@ def train(epoch,min_train_loss):
         # s_loss = sparse_loss(processed_alpha_layers) * args.sparse_loss_lambda
         #print('total_loss: ', total_loss)
         d_loss = squared_mahalanobis_distance_loss(primary_color_layers.detach(), processed_alpha_layers, pred_unmixed_rgb_layers) * args.distance_loss_lambda
+        
+        reconst_img = im2tensor(reconst_img)
+        target_img_ = im2tensor(target_img.detach())
+        l_loss = loss_fn_alex.forward(reconst_img,target_img_).mean() * args.lpips_loss_lambda
+        reconst_img = im2tensor2(reconst_img)
 
-        total_loss = r_loss + m_loss + d_loss
+        total_loss = r_loss + m_loss + d_loss + l_loss
 
         if (math.isnan(total_loss.item())):
             print('----------------------------------------- total_loss is nan, continue... -----------------------------------------')
@@ -184,6 +203,7 @@ def train(epoch,min_train_loss):
         m_loss_mean += m_loss.item()
         # s_loss_mean += s_loss.item()
         d_loss_mean += d_loss.item()
+        l_loss_mean += l_loss.item()
 
         optimizer.step()
 
@@ -196,6 +216,7 @@ def train(epoch,min_train_loss):
             print('reconst_loss *lambda: ', r_loss.item() / len(target_img))
             # print('sparse_loss *lambda: ', s_loss.item() / len(target_img))
             print('squared_mahalanobis_distance_loss *lambda: ', d_loss.item() / len(target_img))
+            print('lpips_loss *lambda: ', l_loss.item() / len(target_img))
 
 
             for save_layer_number in range(args.save_layer_train):
@@ -213,12 +234,14 @@ def train(epoch,min_train_loss):
     m_loss_mean = m_loss_mean / batch_num
     # s_loss_mean = s_loss_mean / batch_num
     d_loss_mean = d_loss_mean / batch_num
+    l_loss_mean = l_loss_mean / batch_num
 
     print('====> Epoch: {} Average loss: {:.6f}'.format(epoch, train_loss ))
     print('====> Epoch: {} Average reconst_loss *lambda: {:.6f}'.format(epoch, r_loss_mean ))
     print('====> Epoch: {} Average mono_loss *lambda: {:.6f}'.format(epoch, m_loss_mean ))
     # print('====> Epoch: {} Average sparse_loss *lambda: {:.6f}'.format(epoch, s_loss_mean ))
     print('====> Epoch: {} Average squared_mahalanobis_distance_loss *lambda: {:.6f}'.format(epoch, d_loss_mean ))
+    print('====> Epoch: {} Average lpips_loss *lambda: {:.6f}'.format(epoch, l_loss_mean ))
 
     if (math.isnan(train_loss)):
         return -1
@@ -233,7 +256,7 @@ def train(epoch,min_train_loss):
 
 
 
-def val(epoch):
+def val(epoch, min_val_loss):
     mask_generator.eval()
     residue_predictor.eval()
 
@@ -243,6 +266,7 @@ def val(epoch):
         m_loss_mean = 0
         # s_loss_mean = 0
         d_loss_mean = 0
+        l_loss_mean = 0
 
         pbar = tqdm(total=len(val_loader))
 
@@ -269,12 +293,19 @@ def val(epoch):
             #print('total_loss: ', total_loss)
             d_loss = squared_mahalanobis_distance_loss(primary_color_layers.detach(), processed_alpha_layers, pred_unmixed_rgb_layers) * args.distance_loss_lambda
 
-            total_loss = r_loss + m_loss  + d_loss
+            reconst_img = im2tensor(reconst_img)
+            target_img_ = im2tensor(target_img.detach())
+            l_loss = loss_fn_alex.forward(reconst_img,target_img_).mean() * args.lpips_loss_lambda
+            reconst_img = im2tensor2(reconst_img)
+
+            total_loss = r_loss + m_loss + d_loss + l_loss
+
             val_loss += total_loss.item()
             r_loss_mean += r_loss.item()
             m_loss_mean += m_loss.item()
             # s_loss_mean += s_loss.item()
             d_loss_mean += d_loss.item()
+            l_loss_mean += l_loss.item()
 
             pbar.update(1)
 
@@ -295,21 +326,31 @@ def val(epoch):
         m_loss_mean = m_loss_mean / len(val_loader.dataset)
         # s_loss_mean = s_loss_mean / len(val_loader.dataset)
         d_loss_mean = d_loss_mean / len(val_loader.dataset)
+        l_loss_mean = l_loss_mean / len(val_loader.dataset)
 
         print('====> Epoch: {} Average val loss: {:.6f}'.format(epoch, val_loss ))
         print('====> Epoch: {} Average val reconst_loss *lambda: {:.6f}'.format(epoch, r_loss_mean ))
         print('====> Epoch: {} Average val mono_loss *lambda: {:.6f}'.format(epoch, m_loss_mean ))
         # print('====> Epoch: {} Average val sparse_loss *lambda: {:.6f}'.format(epoch, s_loss_mean ))
         print('====> Epoch: {} Average val squared_mahalanobis_distance_loss *lambda: {:.6f}'.format(epoch, d_loss_mean ))
+        print('====> Epoch: {} Average val lpips_loss *lambda: {:.6f}'.format(epoch, l_loss_mean ))
 
+        # save best val model
+        if (val_loss < min_val_loss):
+            min_val_loss = val_loss
+            torch.save(mask_generator.state_dict(), 'results/%s/mask_generator_val.pth' % (args.run_name))
+            torch.save(residue_predictor.state_dict(), 'results/%s/residue_predictor_val.pth' % args.run_name)
+
+        return min_val_loss
 
 if __name__ == "__main__":
     
     min_train_loss = 100
+    min_val_loss = 100
     for epoch in range(1, args.epochs + 1):
         print('Start training')
         min_train_loss = train(epoch,min_train_loss)
         if (min_train_loss==-1):
             break
-        val(epoch)
+        min_val_loss = val(epoch,min_val_loss)
 

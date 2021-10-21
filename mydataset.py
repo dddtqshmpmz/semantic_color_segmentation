@@ -133,7 +133,7 @@ class MyDatasetIHC(Dataset):
         primary_color_layers = torch.from_numpy(primary_color_layers.astype(np.float32))
         # mask = torch.from_numpy(mask.astype(np.float32))
 
-        return target_img, primary_color_layers  #, mask   # return torch.Tensor
+        return target_img, primary_color_layers # , mask   # return torch.Tensor
 
     def __len__(self):
         return len(self.imgs_path)
