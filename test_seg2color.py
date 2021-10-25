@@ -408,8 +408,8 @@ with torch.no_grad():
 
     for batch_idx, (target_img, primary_color_layers) in enumerate(test_loader):
         pbar.update(1)
-        if batch_idx < 378: 
-            continue
+        # if batch_idx < 378: 
+        #     continue
         print('img #', batch_idx)
 
         target_img = cut_edge(target_img)
