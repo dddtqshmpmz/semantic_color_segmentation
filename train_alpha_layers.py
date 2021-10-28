@@ -41,15 +41,15 @@ ARCH_NAMES = archs.__all__
 LOSS_NAMES = losses.__all__
 LOSS_NAMES.append('BCEWithLogitsLoss')
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 
 
 parser = argparse.ArgumentParser(description='baseline')
 parser.add_argument('--run_name', type=str, default='train', help='run-name. This name is used for output folder.')
-parser.add_argument('--batch_size', type=int, default=15, metavar='N',  ## 32-> 4
+parser.add_argument('--batch_size', type=int, default=18, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
 
-parser.add_argument('--after_batch_size', type=int, default=24, metavar='N',  ## 32-> 4
+parser.add_argument('--after_batch_size', type=int, default=30, metavar='N',  ## 32-> 4
                     help='input batch size for training after color model complete (default: 32)')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')
@@ -221,10 +221,10 @@ optimizer = optim.Adam(params, lr=config['color_lr'], betas=(0.0, 0.99)) # 0926
 
 
 # 加载新参数
-model = smp.UnetWithColor('efficientnet-b3', in_channels= 3+7 ,
-                     classes= 1, encoder_weights="imagenet").cuda()
+model = smp.UnetWithColor('efficientnet-b4', in_channels= 3+7 ,
+                     classes= 1, encoder_weights="imagenet", decoder_attention_type="ca").cuda()
 model = model.cuda()
-model= nn.DataParallel(model,device_ids=[0,1,2])
+model= nn.DataParallel(model,device_ids=[0,1,2,3])
 
 paramsSeg = filter(lambda p: p.requires_grad, model.parameters())
 
