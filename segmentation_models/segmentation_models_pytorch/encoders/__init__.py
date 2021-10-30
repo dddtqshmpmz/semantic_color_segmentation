@@ -36,7 +36,9 @@ def get_encoder(name, in_channels=3, depth=5, weights=None):
 
     if weights is not None:
         settings = encoders[name]["pretrained_settings"][weights]
-        encoder.load_state_dict(model_zoo.load_url(settings["url"]), strict = False)
+        pretrained_dict = model_zoo.load_url(settings["url"])
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if '_se_' not in k}
+        encoder.load_state_dict(pretrained_dict, strict = False) # , strict = False
         # load new weight here!!
 
     encoder.set_in_channels(in_channels)

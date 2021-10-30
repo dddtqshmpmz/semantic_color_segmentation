@@ -21,6 +21,7 @@ from glob import glob
 import pandas as pd
 import torch.optim as optim
 from torchsummary import summary
+from dataParallel import BalancedDataParallel
 
 import yaml
 from albumentations.augmentations import transforms
@@ -43,13 +44,22 @@ LOSS_NAMES.append('BCEWithLogitsLoss')
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 
+gpu_num = len(os.environ['CUDA_VISIBLE_DEVICES'].split(',') ) - 1
+gpu0_bsz = 4
+other_gpu_bsz = 7
+init_batch_size = gpu0_bsz + gpu_num * other_gpu_bsz
+
+gpu0_bsz_after = gpu0_bsz
+other_gpu_bsz_after = 10
+init_batch_size_after = gpu0_bsz_after + gpu_num * other_gpu_bsz_after
+
 
 parser = argparse.ArgumentParser(description='baseline')
 parser.add_argument('--run_name', type=str, default='train', help='run-name. This name is used for output folder.')
-parser.add_argument('--batch_size', type=int, default=18, metavar='N',  ## 32-> 4
+parser.add_argument('--batch_size', type=int, default=init_batch_size, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
 
-parser.add_argument('--after_batch_size', type=int, default=30, metavar='N',  ## 32-> 4
+parser.add_argument('--after_batch_size', type=int, default= init_batch_size_after, metavar='N',  ## 32-> 4
                     help='input batch size for training after color model complete (default: 32)')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')
@@ -205,12 +215,12 @@ val_after_loader = torch.utils.data.DataLoader(
     drop_last=True  # 加的这句
 )
 
-mask_generator = MaskGenerator(args.num_primary_color).to(device)
-mask_generator = nn.DataParallel(mask_generator)
+mask_generator = MaskGenerator(args.num_primary_color)
+mask_generator = BalancedDataParallel(gpu0_bsz, mask_generator, dim = 0).to(device)
 mask_generator = mask_generator.cuda()
 
-residue_predictor = ResiduePredictor(args.num_primary_color).to(device)
-residue_predictor = nn.DataParallel(residue_predictor)
+residue_predictor = ResiduePredictor(args.num_primary_color)
+residue_predictor = BalancedDataParallel( gpu0_bsz, residue_predictor, dim=0).to(device)
 residue_predictor = residue_predictor.cuda()
 
 params = list(mask_generator.parameters())
@@ -221,10 +231,11 @@ optimizer = optim.Adam(params, lr=config['color_lr'], betas=(0.0, 0.99)) # 0926
 
 
 # 加载新参数
-model = smp.UnetWithColor('efficientnet-b4', in_channels= 3+7 ,
-                     classes= 1, encoder_weights="imagenet", decoder_attention_type="ca").cuda()
+model = smp.UnetWithColor('efficientnet-b3', in_channels= 3+7 ,
+                     classes= 1, encoder_weights="imagenet", decoder_attention_type="ca")
+model = BalancedDataParallel(gpu0_bsz, model, dim=0).to(device)
 model = model.cuda()
-model= nn.DataParallel(model,device_ids=[0,1,2,3])
+
 
 paramsSeg = filter(lambda p: p.requires_grad, model.parameters())
 
