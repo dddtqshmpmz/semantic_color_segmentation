@@ -288,7 +288,7 @@ def train(epoch,min_train_loss):
 
         # networkにforwardにする
         primary_color_pack = primary_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
-        pred_alpha_layers_pack = mask_generator_seg2color(target_img.detach(), primary_color_pack.detach(),output.detach())
+        pred_alpha_layers_pack = mask_generator_seg2color(target_img.detach(), primary_color_pack.detach(),output.detach())  # 这边target_img需要detach吗？
         pred_alpha_layers = pred_alpha_layers_pack.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
 
         # 正規化などのprocessingを行う
@@ -375,8 +375,8 @@ def train(epoch,min_train_loss):
     # save best model
     if (train_loss < min_train_loss):
         min_train_loss = train_loss
-        torch.save(mask_generator_seg2color.state_dict(), 'results/%s/mask_generator.pth' % (args.run_name))
-        torch.save(residue_predictor_seg2color.state_dict(), 'results/%s/residue_predictor.pth' % args.run_name)
+        torch.save(mask_generator_seg2color.state_dict(), 'results/%s/mask_generator_seg2color.pth' % (args.run_name))
+        torch.save(residue_predictor_seg2color.state_dict(), 'results/%s/residue_predictor_seg2color.pth' % args.run_name)
 
     return min_train_loss
 
@@ -480,9 +480,12 @@ def val(epoch,min_val_loss):
 
         if (math.isnan(val_loss)):
             min_val_loss = -1
-        
+    
+        # save best val model
         if (val_loss < min_val_loss):
             min_val_loss = val_loss
+            torch.save(mask_generator_seg2color.state_dict(), 'results/%s/mask_generator_seg2color_val.pth' % (args.run_name))
+            torch.save(residue_predictor_seg2color.state_dict(), 'results/%s/residue_predictor_seg2color_val.pth' % args.run_name)
 
         return min_val_loss
 
@@ -495,9 +498,9 @@ if __name__ == "__main__":
     best_dice = 0
 
 
-    path_mask_generator = 'results/train/20211013_1/mask_generator.pth'
-    path_residue_predictor = 'results/train/20211013_1/residue_predictor.pth'
-    path_seg_model = 'models/multitask/20211013_1_9004/model.pth'
+    path_mask_generator = 'results/train/dedicated_color_models/mask_generator.pth'
+    path_residue_predictor = 'results/train/dedicated_color_models/residue_predictor.pth'
+    path_seg_model = 'models/multitask/20211120/model.pth'
 
 
     mask_generator.load_state_dict(torch.load(path_mask_generator))

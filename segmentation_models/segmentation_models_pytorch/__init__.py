@@ -1,5 +1,6 @@
 from .unet import Unet
 from .unet import UnetWithColor
+from .unet import UnetWithColor_2
 from .linknet import Linknet
 from .unet_flip import Unet_flip
 from .fpn import FPN

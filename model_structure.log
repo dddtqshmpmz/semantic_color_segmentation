@@ -1,0 +1,2502 @@
+BalancedDataParallel(
+  (module): UnetWithColor(
+    (encoder): EfficientNetEncoder(
+      (_conv_stem): Conv2dStaticSamePadding(
+        10, 40, kernel_size=(3, 3), stride=(2, 2), bias=False
+        (static_padding): ZeroPad2d(padding=(0, 1, 0, 1), value=0.0)
+      )
+      (_bn0): BatchNorm2d(40, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+      (_blocks): ModuleList(
+        (0): MBConvBlock(
+          (_depthwise_conv): Conv2dStaticSamePadding(  
+            40, 40, kernel_size=(3, 3), stride=[1, 1], groups=40, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(40, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(40, 8, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(8, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(8, 40, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(8, 40, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            40, 24, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(24, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (1): MBConvBlock(
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            24, 24, kernel_size=(3, 3), stride=(1, 1), groups=24, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(24, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(24, 8, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(8, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(8, 24, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(8, 24, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(24, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (2): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            24, 144, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(144, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            144, 144, kernel_size=(3, 3), stride=[2, 2], groups=144, bias=False
+            (static_padding): ZeroPad2d(padding=(0, 1, 0, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(144, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(144, 8, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(8, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(8, 144, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(8, 144, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            144, 32, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(32, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (3): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            32, 192, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(192, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            192, 192, kernel_size=(3, 3), stride=(1, 1), groups=192, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(192, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(192, 8, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(8, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(8, 192, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(8, 192, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            192, 32, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(32, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (4): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            32, 192, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(192, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            192, 192, kernel_size=(3, 3), stride=(1, 1), groups=192, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(192, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(192, 8, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(8, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(8, 192, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(8, 192, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            192, 32, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(32, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (5): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            32, 192, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(192, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            192, 192, kernel_size=(5, 5), stride=[2, 2], groups=192, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 2, 1, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(192, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(192, 8, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(8, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(8, 192, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(8, 192, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            192, 48, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(48, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (6): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            48, 288, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(288, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            288, 288, kernel_size=(5, 5), stride=(1, 1), groups=288, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(288, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(288, 9, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(9, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(9, 288, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(9, 288, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            288, 48, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(48, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (7): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            48, 288, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(288, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            288, 288, kernel_size=(5, 5), stride=(1, 1), groups=288, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(288, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(288, 9, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(9, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(9, 288, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(9, 288, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            288, 48, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(48, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (8): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            48, 288, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(288, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            288, 288, kernel_size=(3, 3), stride=[2, 2], groups=288, bias=False
+            (static_padding): ZeroPad2d(padding=(0, 1, 0, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(288, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(288, 9, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(9, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(9, 288, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(9, 288, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            288, 96, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(96, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (9): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            96, 576, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(576, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            576, 576, kernel_size=(3, 3), stride=(1, 1), groups=576, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(576, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(576, 18, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(18, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(18, 576, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(18, 576, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            576, 96, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(96, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (10): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            96, 576, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(576, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            576, 576, kernel_size=(3, 3), stride=(1, 1), groups=576, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(576, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(576, 18, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(18, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(18, 576, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(18, 576, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            576, 96, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(96, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (11): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            96, 576, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(576, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            576, 576, kernel_size=(3, 3), stride=(1, 1), groups=576, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(576, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(576, 18, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(18, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(18, 576, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(18, 576, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            576, 96, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(96, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (12): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            96, 576, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(576, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            576, 576, kernel_size=(3, 3), stride=(1, 1), groups=576, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(576, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(576, 18, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(18, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(18, 576, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(18, 576, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            576, 96, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(96, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (13): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            96, 576, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(576, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            576, 576, kernel_size=(5, 5), stride=[1, 1], groups=576, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(576, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(576, 18, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(18, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(18, 576, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(18, 576, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            576, 136, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(136, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (14): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            136, 816, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(816, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            816, 816, kernel_size=(5, 5), stride=(1, 1), groups=816, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(816, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(816, 25, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(25, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(25, 816, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(25, 816, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            816, 136, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(136, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (15): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            136, 816, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(816, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            816, 816, kernel_size=(5, 5), stride=(1, 1), groups=816, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(816, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(816, 25, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(25, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(25, 816, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(25, 816, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            816, 136, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(136, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (16): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            136, 816, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(816, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            816, 816, kernel_size=(5, 5), stride=(1, 1), groups=816, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(816, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(816, 25, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(25, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(25, 816, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(25, 816, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            816, 136, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(136, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (17): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            136, 816, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(816, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            816, 816, kernel_size=(5, 5), stride=(1, 1), groups=816, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(816, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(816, 25, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(25, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(25, 816, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(25, 816, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            816, 136, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(136, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (18): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            136, 816, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(816, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            816, 816, kernel_size=(5, 5), stride=[2, 2], groups=816, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 2, 1, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(816, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(816, 25, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(25, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(25, 816, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(25, 816, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            816, 232, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(232, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (19): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            232, 1392, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            1392, 1392, kernel_size=(5, 5), stride=(1, 1), groups=1392, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(1392, 43, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(43, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            1392, 232, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(232, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (20): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            232, 1392, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            1392, 1392, kernel_size=(5, 5), stride=(1, 1), groups=1392, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(1392, 43, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(43, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            1392, 232, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(232, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (21): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            232, 1392, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            1392, 1392, kernel_size=(5, 5), stride=(1, 1), groups=1392, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(1392, 43, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(43, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            1392, 232, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(232, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (22): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            232, 1392, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            1392, 1392, kernel_size=(5, 5), stride=(1, 1), groups=1392, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(1392, 43, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(43, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            1392, 232, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(232, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (23): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            232, 1392, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            1392, 1392, kernel_size=(5, 5), stride=(1, 1), groups=1392, bias=False
+            (static_padding): ZeroPad2d(padding=(2, 2, 2, 2), value=0.0)
+          )
+          (_bn1): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(1392, 43, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(43, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            1392, 232, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(232, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (24): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            232, 1392, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            1392, 1392, kernel_size=(3, 3), stride=[1, 1], groups=1392, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(1392, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(1392, 43, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(43, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(43, 1392, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            1392, 384, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(384, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+        (25): MBConvBlock(
+          (_expand_conv): Conv2dStaticSamePadding(
+            384, 2304, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn0): BatchNorm2d(2304, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_depthwise_conv): Conv2dStaticSamePadding(
+            2304, 2304, kernel_size=(3, 3), stride=(1, 1), groups=2304, bias=False
+            (static_padding): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+          )
+          (_bn1): BatchNorm2d(2304, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (pool_h): AdaptiveAvgPool2d(output_size=(None, 1))
+          (pool_w): AdaptiveAvgPool2d(output_size=(1, None))
+          (conv1): Conv2d(2304, 72, kernel_size=(1, 1), stride=(1, 1))
+          (bn1): BatchNorm2d(72, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (conv2): Conv2d(72, 2304, kernel_size=(1, 1), stride=(1, 1))
+          (conv3): Conv2d(72, 2304, kernel_size=(1, 1), stride=(1, 1))
+          (relu): h_swish(
+            (sigmoid): h_sigmoid(
+              (relu): ReLU6(inplace=True)
+            )
+          )
+          (_project_conv): Conv2dStaticSamePadding(
+            2304, 384, kernel_size=(1, 1), stride=(1, 1), bias=False
+            (static_padding): Identity()
+          )
+          (_bn2): BatchNorm2d(384, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+          (_swish): MemoryEfficientSwish()
+        )
+      )
+      (_conv_head): Conv2dStaticSamePadding(
+        384, 1536, kernel_size=(1, 1), stride=(1, 1), bias=False
+        (static_padding): Identity()
+      )
+      (_bn1): BatchNorm2d(1536, eps=0.001, momentum=0.010000000000000009, affine=True, track_running_stats=True)
+      (_avg_pooling): AdaptiveAvgPool2d(output_size=1)
+      (_dropout): Dropout(p=0.3, inplace=False)
+      (_swish): MemoryEfficientSwish()
+    )
+    (decoder): UnetDecoderWithColor(
+      (center): Identity()
+      (blocks): ModuleList(
+        (0): DecoderBlock(
+          (conv1): Conv2dReLU(
+            (0): Conv2d(520, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+          )
+          (attention1): Attention(
+            (attention): Identity()
+          )
+          (conv2): Conv2dReLU(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+          )
+          (attention2): Attention(
+            (attention): Identity()
+          )
+        )
+        (1): DecoderBlock(
+          (conv1): Conv2dReLU(
+            (0): Conv2d(304, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+          )
+          (attention1): Attention(
+            (attention): Identity()
+          )
+          (conv2): Conv2dReLU(
+            (0): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+          )
+          (attention2): Attention(
+            (attention): Identity()
+          )
+        )
+        (2): DecoderBlock(
+          (conv1): Conv2dReLU(
+            (0): Conv2d(160, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+          )
+          (attention1): Attention(
+            (attention): Identity()
+          )
+          (conv2): Conv2dReLU(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+          )
+          (attention2): Attention(
+            (attention): Identity()
+          )
+        )
+        (3): DecoderBlock(
+          (conv1): Conv2dReLU(
+            (0): Conv2d(104, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+          )
+          (attention1): Attention(
+            (attention): Identity()
+          )
+          (conv2): Conv2dReLU(
+            (0): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+          )
+          (attention2): Attention(
+            (attention): Identity()
+          )
+        )
+        (4): DecoderBlock(
+          (conv1): Conv2dReLU(
+            (0): Conv2d(32, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+          )
+          (attention1): Attention(
+            (attention): Identity()
+          )
+          (conv2): Conv2dReLU(
+            (0): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+          )
+          (attention2): Attention(
+            (attention): Identity()
+          )
+        )
+      )
+    )
+    (segmentation_head): SegmentationHead(
+      (0): Conv2d(16, 1, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): Identity()
+      (2): Activation(
+        (activation): Identity()
+      )
+    )
+  )
+)
+Start training
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+         ZeroPad2d-1         [-1, 10, 321, 321]               0
+         ZeroPad2d-2         [-1, 10, 321, 321]               0
+Conv2dStaticSamePadding-3         [-1, 48, 160, 160]           4,320
+       BatchNorm2d-4         [-1, 48, 160, 160]              96
+MemoryEfficientSwish-5         [-1, 48, 160, 160]               0
+         ZeroPad2d-6         [-1, 48, 162, 162]               0
+Conv2dStaticSamePadding-7         [-1, 48, 160, 160]             432
+       BatchNorm2d-8         [-1, 48, 160, 160]              96
+MemoryEfficientSwish-9         [-1, 48, 160, 160]               0
+AdaptiveAvgPool2d-10           [-1, 48, 160, 1]               0
+AdaptiveAvgPool2d-11           [-1, 48, 1, 160]               0
+           Conv2d-12            [-1, 8, 320, 1]             392
+      BatchNorm2d-13            [-1, 8, 320, 1]              16
+            ReLU6-14            [-1, 8, 320, 1]               0
+        h_sigmoid-15            [-1, 8, 320, 1]               0
+          h_swish-16            [-1, 8, 320, 1]               0
+           Conv2d-17           [-1, 48, 160, 1]             432
+           Conv2d-18           [-1, 48, 1, 160]             432
+         Identity-19         [-1, 48, 160, 160]               0
+Conv2dStaticSamePadding-20         [-1, 24, 160, 160]           1,152
+      BatchNorm2d-21         [-1, 24, 160, 160]              48
+      MBConvBlock-22         [-1, 24, 160, 160]               0
+        ZeroPad2d-23         [-1, 24, 162, 162]               0
+Conv2dStaticSamePadding-24         [-1, 24, 160, 160]             216
+      BatchNorm2d-25         [-1, 24, 160, 160]              48
+MemoryEfficientSwish-26         [-1, 24, 160, 160]               0
+AdaptiveAvgPool2d-27           [-1, 24, 160, 1]               0
+AdaptiveAvgPool2d-28           [-1, 24, 1, 160]               0
+           Conv2d-29            [-1, 8, 320, 1]             200
+      BatchNorm2d-30            [-1, 8, 320, 1]              16
+            ReLU6-31            [-1, 8, 320, 1]               0
+        h_sigmoid-32            [-1, 8, 320, 1]               0
+          h_swish-33            [-1, 8, 320, 1]               0
+           Conv2d-34           [-1, 24, 160, 1]             216
+           Conv2d-35           [-1, 24, 1, 160]             216
+         Identity-36         [-1, 24, 160, 160]               0
+Conv2dStaticSamePadding-37         [-1, 24, 160, 160]             576
+      BatchNorm2d-38         [-1, 24, 160, 160]              48
+      MBConvBlock-39         [-1, 24, 160, 160]               0
+         Identity-40         [-1, 24, 160, 160]               0
+Conv2dStaticSamePadding-41        [-1, 144, 160, 160]           3,456
+      BatchNorm2d-42        [-1, 144, 160, 160]             288
+MemoryEfficientSwish-43        [-1, 144, 160, 160]               0
+        ZeroPad2d-44        [-1, 144, 161, 161]               0
+Conv2dStaticSamePadding-45          [-1, 144, 80, 80]           1,296
+      BatchNorm2d-46          [-1, 144, 80, 80]             288
+MemoryEfficientSwish-47          [-1, 144, 80, 80]               0
+AdaptiveAvgPool2d-48           [-1, 144, 80, 1]               0
+AdaptiveAvgPool2d-49           [-1, 144, 1, 80]               0
+           Conv2d-50            [-1, 8, 160, 1]           1,160
+      BatchNorm2d-51            [-1, 8, 160, 1]              16
+            ReLU6-52            [-1, 8, 160, 1]               0
+        h_sigmoid-53            [-1, 8, 160, 1]               0
+          h_swish-54            [-1, 8, 160, 1]               0
+           Conv2d-55           [-1, 144, 80, 1]           1,296
+           Conv2d-56           [-1, 144, 1, 80]           1,296
+         Identity-57          [-1, 144, 80, 80]               0
+Conv2dStaticSamePadding-58           [-1, 32, 80, 80]           4,608
+      BatchNorm2d-59           [-1, 32, 80, 80]              64
+      MBConvBlock-60           [-1, 32, 80, 80]               0
+         Identity-61           [-1, 32, 80, 80]               0
+Conv2dStaticSamePadding-62          [-1, 192, 80, 80]           6,144
+      BatchNorm2d-63          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-64          [-1, 192, 80, 80]               0
+        ZeroPad2d-65          [-1, 192, 82, 82]               0
+Conv2dStaticSamePadding-66          [-1, 192, 80, 80]           1,728
+      BatchNorm2d-67          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-68          [-1, 192, 80, 80]               0
+AdaptiveAvgPool2d-69           [-1, 192, 80, 1]               0
+AdaptiveAvgPool2d-70           [-1, 192, 1, 80]               0
+           Conv2d-71            [-1, 8, 160, 1]           1,544
+      BatchNorm2d-72            [-1, 8, 160, 1]              16
+            ReLU6-73            [-1, 8, 160, 1]               0
+        h_sigmoid-74            [-1, 8, 160, 1]               0
+          h_swish-75            [-1, 8, 160, 1]               0
+           Conv2d-76           [-1, 192, 80, 1]           1,728
+           Conv2d-77           [-1, 192, 1, 80]           1,728
+         Identity-78          [-1, 192, 80, 80]               0
+Conv2dStaticSamePadding-79           [-1, 32, 80, 80]           6,144
+      BatchNorm2d-80           [-1, 32, 80, 80]              64
+      MBConvBlock-81           [-1, 32, 80, 80]               0
+         Identity-82           [-1, 32, 80, 80]               0
+Conv2dStaticSamePadding-83          [-1, 192, 80, 80]           6,144
+      BatchNorm2d-84          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-85          [-1, 192, 80, 80]               0
+        ZeroPad2d-86          [-1, 192, 82, 82]               0
+Conv2dStaticSamePadding-87          [-1, 192, 80, 80]           1,728
+      BatchNorm2d-88          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-89          [-1, 192, 80, 80]               0
+AdaptiveAvgPool2d-90           [-1, 192, 80, 1]               0
+AdaptiveAvgPool2d-91           [-1, 192, 1, 80]               0
+           Conv2d-92            [-1, 8, 160, 1]           1,544
+      BatchNorm2d-93            [-1, 8, 160, 1]              16
+            ReLU6-94            [-1, 8, 160, 1]               0
+        h_sigmoid-95            [-1, 8, 160, 1]               0
+          h_swish-96            [-1, 8, 160, 1]               0
+           Conv2d-97           [-1, 192, 80, 1]           1,728
+           Conv2d-98           [-1, 192, 1, 80]           1,728
+         Identity-99          [-1, 192, 80, 80]               0
+Conv2dStaticSamePadding-100           [-1, 32, 80, 80]           6,144
+     BatchNorm2d-101           [-1, 32, 80, 80]              64
+     MBConvBlock-102           [-1, 32, 80, 80]               0
+        Identity-103           [-1, 32, 80, 80]               0
+Conv2dStaticSamePadding-104          [-1, 192, 80, 80]           6,144
+     BatchNorm2d-105          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-106          [-1, 192, 80, 80]               0
+       ZeroPad2d-107          [-1, 192, 82, 82]               0
+Conv2dStaticSamePadding-108          [-1, 192, 80, 80]           1,728
+     BatchNorm2d-109          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-110          [-1, 192, 80, 80]               0
+AdaptiveAvgPool2d-111           [-1, 192, 80, 1]               0
+AdaptiveAvgPool2d-112           [-1, 192, 1, 80]               0
+          Conv2d-113            [-1, 8, 160, 1]           1,544
+     BatchNorm2d-114            [-1, 8, 160, 1]              16
+           ReLU6-115            [-1, 8, 160, 1]               0
+       h_sigmoid-116            [-1, 8, 160, 1]               0
+         h_swish-117            [-1, 8, 160, 1]               0
+          Conv2d-118           [-1, 192, 80, 1]           1,728
+          Conv2d-119           [-1, 192, 1, 80]           1,728
+        Identity-120          [-1, 192, 80, 80]               0
+Conv2dStaticSamePadding-121           [-1, 32, 80, 80]           6,144
+     BatchNorm2d-122           [-1, 32, 80, 80]              64
+     MBConvBlock-123           [-1, 32, 80, 80]               0
+        Identity-124           [-1, 32, 80, 80]               0
+Conv2dStaticSamePadding-125          [-1, 192, 80, 80]           6,144
+     BatchNorm2d-126          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-127          [-1, 192, 80, 80]               0
+       ZeroPad2d-128          [-1, 192, 83, 83]               0
+Conv2dStaticSamePadding-129          [-1, 192, 40, 40]           4,800
+     BatchNorm2d-130          [-1, 192, 40, 40]             384
+MemoryEfficientSwish-131          [-1, 192, 40, 40]               0
+AdaptiveAvgPool2d-132           [-1, 192, 40, 1]               0
+AdaptiveAvgPool2d-133           [-1, 192, 1, 40]               0
+          Conv2d-134             [-1, 8, 80, 1]           1,544
+     BatchNorm2d-135             [-1, 8, 80, 1]              16
+           ReLU6-136             [-1, 8, 80, 1]               0
+       h_sigmoid-137             [-1, 8, 80, 1]               0
+         h_swish-138             [-1, 8, 80, 1]               0
+          Conv2d-139           [-1, 192, 40, 1]           1,728
+          Conv2d-140           [-1, 192, 1, 40]           1,728
+        Identity-141          [-1, 192, 40, 40]               0
+Conv2dStaticSamePadding-142           [-1, 56, 40, 40]          10,752
+     BatchNorm2d-143           [-1, 56, 40, 40]             112
+     MBConvBlock-144           [-1, 56, 40, 40]               0
+        Identity-145           [-1, 56, 40, 40]               0
+Conv2dStaticSamePadding-146          [-1, 336, 40, 40]          18,816
+     BatchNorm2d-147          [-1, 336, 40, 40]             672
+MemoryEfficientSwish-148          [-1, 336, 40, 40]               0
+       ZeroPad2d-149          [-1, 336, 44, 44]               0
+Conv2dStaticSamePadding-150          [-1, 336, 40, 40]           8,400
+     BatchNorm2d-151          [-1, 336, 40, 40]             672
+MemoryEfficientSwish-152          [-1, 336, 40, 40]               0
+AdaptiveAvgPool2d-153           [-1, 336, 40, 1]               0
+AdaptiveAvgPool2d-154           [-1, 336, 1, 40]               0
+Conv2dStaticSamePadding-155         [-1, 48, 160, 160]           4,320
+     BatchNorm2d-156         [-1, 48, 160, 160]              96
+MemoryEfficientSwish-157         [-1, 48, 160, 160]               0
+       ZeroPad2d-158         [-1, 48, 162, 162]               0
+Conv2dStaticSamePadding-159         [-1, 48, 160, 160]             432
+     BatchNorm2d-160         [-1, 48, 160, 160]              96
+MemoryEfficientSwish-161         [-1, 48, 160, 160]               0
+AdaptiveAvgPool2d-162           [-1, 48, 160, 1]               0
+AdaptiveAvgPool2d-163           [-1, 48, 1, 160]               0
+          Conv2d-164            [-1, 10, 80, 1]           3,370
+          Conv2d-165            [-1, 8, 320, 1]             392
+     BatchNorm2d-166            [-1, 10, 80, 1]              20
+     BatchNorm2d-167            [-1, 8, 320, 1]              16
+           ReLU6-168            [-1, 10, 80, 1]               0
+       h_sigmoid-169            [-1, 10, 80, 1]               0
+         h_swish-170            [-1, 10, 80, 1]               0
+           ReLU6-171            [-1, 8, 320, 1]               0
+       h_sigmoid-172            [-1, 8, 320, 1]               0
+         h_swish-173            [-1, 8, 320, 1]               0
+          Conv2d-174           [-1, 48, 160, 1]             432
+          Conv2d-175           [-1, 48, 1, 160]             432
+        Identity-176         [-1, 48, 160, 160]               0
+Conv2dStaticSamePadding-177         [-1, 24, 160, 160]           1,152
+     BatchNorm2d-178         [-1, 24, 160, 160]              48
+     MBConvBlock-179         [-1, 24, 160, 160]               0
+       ZeroPad2d-180         [-1, 24, 162, 162]               0
+Conv2dStaticSamePadding-181         [-1, 24, 160, 160]             216
+     BatchNorm2d-182         [-1, 24, 160, 160]              48
+MemoryEfficientSwish-183         [-1, 24, 160, 160]               0
+          Conv2d-184           [-1, 336, 40, 1]           3,696
+AdaptiveAvgPool2d-185           [-1, 24, 160, 1]               0
+AdaptiveAvgPool2d-186           [-1, 24, 1, 160]               0
+          Conv2d-187            [-1, 8, 320, 1]             200
+     BatchNorm2d-188            [-1, 8, 320, 1]              16
+           ReLU6-189            [-1, 8, 320, 1]               0
+       h_sigmoid-190            [-1, 8, 320, 1]               0
+         h_swish-191            [-1, 8, 320, 1]               0
+          Conv2d-192           [-1, 24, 160, 1]             216
+          Conv2d-193           [-1, 24, 1, 160]             216
+        Identity-194         [-1, 24, 160, 160]               0
+Conv2dStaticSamePadding-195         [-1, 24, 160, 160]             576
+     BatchNorm2d-196         [-1, 24, 160, 160]              48
+     MBConvBlock-197         [-1, 24, 160, 160]               0
+        Identity-198         [-1, 24, 160, 160]               0
+Conv2dStaticSamePadding-199        [-1, 144, 160, 160]           3,456
+          Conv2d-200           [-1, 336, 1, 40]           3,696
+     BatchNorm2d-201        [-1, 144, 160, 160]             288
+        Identity-202          [-1, 336, 40, 40]               0
+MemoryEfficientSwish-203        [-1, 144, 160, 160]               0
+       ZeroPad2d-204        [-1, 144, 161, 161]               0
+Conv2dStaticSamePadding-205          [-1, 144, 80, 80]           1,296
+     BatchNorm2d-206          [-1, 144, 80, 80]             288
+MemoryEfficientSwish-207          [-1, 144, 80, 80]               0
+AdaptiveAvgPool2d-208           [-1, 144, 80, 1]               0
+AdaptiveAvgPool2d-209           [-1, 144, 1, 80]               0
+          Conv2d-210            [-1, 8, 160, 1]           1,160
+     BatchNorm2d-211            [-1, 8, 160, 1]              16
+           ReLU6-212            [-1, 8, 160, 1]               0
+       h_sigmoid-213            [-1, 8, 160, 1]               0
+         h_swish-214            [-1, 8, 160, 1]               0
+          Conv2d-215           [-1, 144, 80, 1]           1,296
+          Conv2d-216           [-1, 144, 1, 80]           1,296
+        Identity-217          [-1, 144, 80, 80]               0
+Conv2dStaticSamePadding-218           [-1, 32, 80, 80]           4,608
+     BatchNorm2d-219           [-1, 32, 80, 80]              64
+     MBConvBlock-220           [-1, 32, 80, 80]               0
+        Identity-221           [-1, 32, 80, 80]               0
+Conv2dStaticSamePadding-222          [-1, 192, 80, 80]           6,144
+     BatchNorm2d-223          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-224          [-1, 192, 80, 80]               0
+       ZeroPad2d-225          [-1, 192, 82, 82]               0
+Conv2dStaticSamePadding-226          [-1, 192, 80, 80]           1,728
+Conv2dStaticSamePadding-227           [-1, 56, 40, 40]          18,816
+     BatchNorm2d-228          [-1, 192, 80, 80]             384
+     BatchNorm2d-229           [-1, 56, 40, 40]             112
+MemoryEfficientSwish-230          [-1, 192, 80, 80]               0
+AdaptiveAvgPool2d-231           [-1, 192, 80, 1]               0
+AdaptiveAvgPool2d-232           [-1, 192, 1, 80]               0
+     MBConvBlock-233           [-1, 56, 40, 40]               0
+        Identity-234           [-1, 56, 40, 40]               0
+Conv2dStaticSamePadding-235          [-1, 336, 40, 40]          18,816
+          Conv2d-236            [-1, 8, 160, 1]           1,544
+     BatchNorm2d-237          [-1, 336, 40, 40]             672
+     BatchNorm2d-238            [-1, 8, 160, 1]              16
+MemoryEfficientSwish-239          [-1, 336, 40, 40]               0
+       ZeroPad2d-240          [-1, 336, 44, 44]               0
+           ReLU6-241            [-1, 8, 160, 1]               0
+Conv2dStaticSamePadding-242          [-1, 336, 40, 40]           8,400
+       h_sigmoid-243            [-1, 8, 160, 1]               0
+         h_swish-244            [-1, 8, 160, 1]               0
+     BatchNorm2d-245          [-1, 336, 40, 40]             672
+          Conv2d-246           [-1, 192, 80, 1]           1,728
+MemoryEfficientSwish-247          [-1, 336, 40, 40]               0
+AdaptiveAvgPool2d-248           [-1, 336, 40, 1]               0
+          Conv2d-249           [-1, 192, 1, 80]           1,728
+AdaptiveAvgPool2d-250           [-1, 336, 1, 40]               0
+          Conv2d-251            [-1, 10, 80, 1]           3,370
+        Identity-252          [-1, 192, 80, 80]               0
+Conv2dStaticSamePadding-253           [-1, 32, 80, 80]           6,144
+     BatchNorm2d-254            [-1, 10, 80, 1]              20
+     BatchNorm2d-255           [-1, 32, 80, 80]              64
+           ReLU6-256            [-1, 10, 80, 1]               0
+       h_sigmoid-257            [-1, 10, 80, 1]               0
+         h_swish-258            [-1, 10, 80, 1]               0
+          Conv2d-259           [-1, 336, 40, 1]           3,696
+     MBConvBlock-260           [-1, 32, 80, 80]               0
+        Identity-261           [-1, 32, 80, 80]               0
+          Conv2d-262           [-1, 336, 1, 40]           3,696
+Conv2dStaticSamePadding-263          [-1, 192, 80, 80]           6,144
+        Identity-264          [-1, 336, 40, 40]               0
+Conv2dStaticSamePadding-265           [-1, 56, 40, 40]          18,816
+     BatchNorm2d-266          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-267          [-1, 192, 80, 80]               0
+     BatchNorm2d-268           [-1, 56, 40, 40]             112
+       ZeroPad2d-269          [-1, 192, 82, 82]               0
+Conv2dStaticSamePadding-270          [-1, 192, 80, 80]           1,728
+     MBConvBlock-271           [-1, 56, 40, 40]               0
+        Identity-272           [-1, 56, 40, 40]               0
+     BatchNorm2d-273          [-1, 192, 80, 80]             384
+Conv2dStaticSamePadding-274          [-1, 336, 40, 40]          18,816
+MemoryEfficientSwish-275          [-1, 192, 80, 80]               0
+AdaptiveAvgPool2d-276           [-1, 192, 80, 1]               0
+AdaptiveAvgPool2d-277           [-1, 192, 1, 80]               0
+     BatchNorm2d-278          [-1, 336, 40, 40]             672
+          Conv2d-279            [-1, 8, 160, 1]           1,544
+MemoryEfficientSwish-280          [-1, 336, 40, 40]               0
+       ZeroPad2d-281          [-1, 336, 44, 44]               0
+Conv2dStaticSamePadding-282          [-1, 336, 40, 40]           8,400
+     BatchNorm2d-283            [-1, 8, 160, 1]              16
+           ReLU6-284            [-1, 8, 160, 1]               0
+       h_sigmoid-285            [-1, 8, 160, 1]               0
+     BatchNorm2d-286          [-1, 336, 40, 40]             672
+         h_swish-287            [-1, 8, 160, 1]               0
+          Conv2d-288           [-1, 192, 80, 1]           1,728
+MemoryEfficientSwish-289          [-1, 336, 40, 40]               0
+          Conv2d-290           [-1, 192, 1, 80]           1,728
+AdaptiveAvgPool2d-291           [-1, 336, 40, 1]               0
+AdaptiveAvgPool2d-292           [-1, 336, 1, 40]               0
+        Identity-293          [-1, 192, 80, 80]               0
+          Conv2d-294            [-1, 10, 80, 1]           3,370
+Conv2dStaticSamePadding-295           [-1, 32, 80, 80]           6,144
+     BatchNorm2d-296           [-1, 32, 80, 80]              64
+     BatchNorm2d-297            [-1, 10, 80, 1]              20
+           ReLU6-298            [-1, 10, 80, 1]               0
+       h_sigmoid-299            [-1, 10, 80, 1]               0
+     MBConvBlock-300           [-1, 32, 80, 80]               0
+        Identity-301           [-1, 32, 80, 80]               0
+         h_swish-302            [-1, 10, 80, 1]               0
+Conv2dStaticSamePadding-303          [-1, 192, 80, 80]           6,144
+          Conv2d-304           [-1, 336, 40, 1]           3,696
+     BatchNorm2d-305          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-306          [-1, 192, 80, 80]               0
+          Conv2d-307           [-1, 336, 1, 40]           3,696
+       ZeroPad2d-308          [-1, 192, 82, 82]               0
+Conv2dStaticSamePadding-309          [-1, 192, 80, 80]           1,728
+        Identity-310          [-1, 336, 40, 40]               0
+Conv2dStaticSamePadding-311           [-1, 56, 40, 40]          18,816
+     BatchNorm2d-312          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-313          [-1, 192, 80, 80]               0
+     BatchNorm2d-314           [-1, 56, 40, 40]             112
+AdaptiveAvgPool2d-315           [-1, 192, 80, 1]               0
+AdaptiveAvgPool2d-316           [-1, 192, 1, 80]               0
+          Conv2d-317            [-1, 8, 160, 1]           1,544
+     MBConvBlock-318           [-1, 56, 40, 40]               0
+        Identity-319           [-1, 56, 40, 40]               0
+Conv2dStaticSamePadding-320          [-1, 336, 40, 40]          18,816
+     BatchNorm2d-321            [-1, 8, 160, 1]              16
+           ReLU6-322            [-1, 8, 160, 1]               0
+     BatchNorm2d-323          [-1, 336, 40, 40]             672
+       h_sigmoid-324            [-1, 8, 160, 1]               0
+         h_swish-325            [-1, 8, 160, 1]               0
+MemoryEfficientSwish-326          [-1, 336, 40, 40]               0
+          Conv2d-327           [-1, 192, 80, 1]           1,728
+       ZeroPad2d-328          [-1, 336, 41, 41]               0
+Conv2dStaticSamePadding-329          [-1, 336, 20, 20]           3,024
+          Conv2d-330           [-1, 192, 1, 80]           1,728
+     BatchNorm2d-331          [-1, 336, 20, 20]             672
+        Identity-332          [-1, 192, 80, 80]               0
+Conv2dStaticSamePadding-333           [-1, 32, 80, 80]           6,144
+MemoryEfficientSwish-334          [-1, 336, 20, 20]               0
+AdaptiveAvgPool2d-335           [-1, 336, 20, 1]               0
+     BatchNorm2d-336           [-1, 32, 80, 80]              64
+AdaptiveAvgPool2d-337           [-1, 336, 1, 20]               0
+     MBConvBlock-338           [-1, 32, 80, 80]               0
+        Identity-339           [-1, 32, 80, 80]               0
+Conv2dStaticSamePadding-340          [-1, 192, 80, 80]           6,144
+     BatchNorm2d-341          [-1, 192, 80, 80]             384
+MemoryEfficientSwish-342          [-1, 192, 80, 80]               0
+       ZeroPad2d-343          [-1, 192, 83, 83]               0
+Conv2dStaticSamePadding-344          [-1, 192, 40, 40]           4,800
+          Conv2d-345            [-1, 10, 40, 1]           3,370
+     BatchNorm2d-346          [-1, 192, 40, 40]             384
+     BatchNorm2d-347            [-1, 10, 40, 1]              20
+MemoryEfficientSwish-348          [-1, 192, 40, 40]               0
+AdaptiveAvgPool2d-349           [-1, 192, 40, 1]               0
+AdaptiveAvgPool2d-350           [-1, 192, 1, 40]               0
+           ReLU6-351            [-1, 10, 40, 1]               0
+       h_sigmoid-352            [-1, 10, 40, 1]               0
+         h_swish-353            [-1, 10, 40, 1]               0
+          Conv2d-354             [-1, 8, 80, 1]           1,544
+     BatchNorm2d-355             [-1, 8, 80, 1]              16
+           ReLU6-356             [-1, 8, 80, 1]               0
+       h_sigmoid-357             [-1, 8, 80, 1]               0
+         h_swish-358             [-1, 8, 80, 1]               0
+          Conv2d-359           [-1, 192, 40, 1]           1,728
+          Conv2d-360           [-1, 336, 20, 1]           3,696
+          Conv2d-361           [-1, 192, 1, 40]           1,728
+        Identity-362          [-1, 192, 40, 40]               0
+Conv2dStaticSamePadding-363           [-1, 56, 40, 40]          10,752
+     BatchNorm2d-364           [-1, 56, 40, 40]             112
+     MBConvBlock-365           [-1, 56, 40, 40]               0
+        Identity-366           [-1, 56, 40, 40]               0
+Conv2dStaticSamePadding-367          [-1, 336, 40, 40]          18,816
+     BatchNorm2d-368          [-1, 336, 40, 40]             672
+MemoryEfficientSwish-369          [-1, 336, 40, 40]               0
+          Conv2d-370           [-1, 336, 1, 20]           3,696
+       ZeroPad2d-371          [-1, 336, 44, 44]               0
+Conv2dStaticSamePadding-372          [-1, 336, 40, 40]           8,400
+        Identity-373          [-1, 336, 20, 20]               0
+     BatchNorm2d-374          [-1, 336, 40, 40]             672
+MemoryEfficientSwish-375          [-1, 336, 40, 40]               0
+AdaptiveAvgPool2d-376           [-1, 336, 40, 1]               0
+AdaptiveAvgPool2d-377           [-1, 336, 1, 40]               0
+          Conv2d-378            [-1, 10, 80, 1]           3,370
+     BatchNorm2d-379            [-1, 10, 80, 1]              20
+           ReLU6-380            [-1, 10, 80, 1]               0
+       h_sigmoid-381            [-1, 10, 80, 1]               0
+         h_swish-382            [-1, 10, 80, 1]               0
+          Conv2d-383           [-1, 336, 40, 1]           3,696
+          Conv2d-384           [-1, 336, 1, 40]           3,696
+        Identity-385          [-1, 336, 40, 40]               0
+Conv2dStaticSamePadding-386           [-1, 56, 40, 40]          18,816
+     BatchNorm2d-387           [-1, 56, 40, 40]             112
+Conv2dStaticSamePadding-388          [-1, 112, 20, 20]          37,632
+     BatchNorm2d-389          [-1, 112, 20, 20]             224
+     MBConvBlock-390           [-1, 56, 40, 40]               0
+        Identity-391           [-1, 56, 40, 40]               0
+     MBConvBlock-392          [-1, 112, 20, 20]               0
+        Identity-393          [-1, 112, 20, 20]               0
+Conv2dStaticSamePadding-394          [-1, 336, 40, 40]          18,816
+     BatchNorm2d-395          [-1, 336, 40, 40]             672
+MemoryEfficientSwish-396          [-1, 336, 40, 40]               0
+       ZeroPad2d-397          [-1, 336, 44, 44]               0
+Conv2dStaticSamePadding-398          [-1, 336, 40, 40]           8,400
+     BatchNorm2d-399          [-1, 336, 40, 40]             672
+MemoryEfficientSwish-400          [-1, 336, 40, 40]               0
+AdaptiveAvgPool2d-401           [-1, 336, 40, 1]               0
+AdaptiveAvgPool2d-402           [-1, 336, 1, 40]               0
+          Conv2d-403            [-1, 10, 80, 1]           3,370
+     BatchNorm2d-404            [-1, 10, 80, 1]              20
+           ReLU6-405            [-1, 10, 80, 1]               0
+       h_sigmoid-406            [-1, 10, 80, 1]               0
+         h_swish-407            [-1, 10, 80, 1]               0
+          Conv2d-408           [-1, 336, 40, 1]           3,696
+          Conv2d-409           [-1, 336, 1, 40]           3,696
+        Identity-410          [-1, 336, 40, 40]               0
+Conv2dStaticSamePadding-411           [-1, 56, 40, 40]          18,816
+Conv2dStaticSamePadding-412          [-1, 672, 20, 20]          75,264
+     BatchNorm2d-413           [-1, 56, 40, 40]             112
+     BatchNorm2d-414          [-1, 672, 20, 20]           1,344
+MemoryEfficientSwish-415          [-1, 672, 20, 20]               0
+       ZeroPad2d-416          [-1, 672, 22, 22]               0
+Conv2dStaticSamePadding-417          [-1, 672, 20, 20]           6,048
+     MBConvBlock-418           [-1, 56, 40, 40]               0
+        Identity-419           [-1, 56, 40, 40]               0
+Conv2dStaticSamePadding-420          [-1, 336, 40, 40]          18,816
+     BatchNorm2d-421          [-1, 672, 20, 20]           1,344
+MemoryEfficientSwish-422          [-1, 672, 20, 20]               0
+     BatchNorm2d-423          [-1, 336, 40, 40]             672
+AdaptiveAvgPool2d-424           [-1, 672, 20, 1]               0
+AdaptiveAvgPool2d-425           [-1, 672, 1, 20]               0
+MemoryEfficientSwish-426          [-1, 336, 40, 40]               0
+       ZeroPad2d-427          [-1, 336, 44, 44]               0
+Conv2dStaticSamePadding-428          [-1, 336, 40, 40]           8,400
+     BatchNorm2d-429          [-1, 336, 40, 40]             672
+MemoryEfficientSwish-430          [-1, 336, 40, 40]               0
+AdaptiveAvgPool2d-431           [-1, 336, 40, 1]               0
+AdaptiveAvgPool2d-432           [-1, 336, 1, 40]               0
+          Conv2d-433            [-1, 10, 80, 1]           3,370
+     BatchNorm2d-434            [-1, 10, 80, 1]              20
+           ReLU6-435            [-1, 10, 80, 1]               0
+       h_sigmoid-436            [-1, 10, 80, 1]               0
+          Conv2d-437            [-1, 21, 40, 1]          14,133
+         h_swish-438            [-1, 10, 80, 1]               0
+     BatchNorm2d-439            [-1, 21, 40, 1]              42
+          Conv2d-440           [-1, 336, 40, 1]           3,696
+           ReLU6-441            [-1, 21, 40, 1]               0
+       h_sigmoid-442            [-1, 21, 40, 1]               0
+         h_swish-443            [-1, 21, 40, 1]               0
+          Conv2d-444           [-1, 336, 1, 40]           3,696
+        Identity-445          [-1, 336, 40, 40]               0
+Conv2dStaticSamePadding-446           [-1, 56, 40, 40]          18,816
+     BatchNorm2d-447           [-1, 56, 40, 40]             112
+     MBConvBlock-448           [-1, 56, 40, 40]               0
+        Identity-449           [-1, 56, 40, 40]               0
+          Conv2d-450           [-1, 672, 20, 1]          14,784
+Conv2dStaticSamePadding-451          [-1, 336, 40, 40]          18,816
+     BatchNorm2d-452          [-1, 336, 40, 40]             672
+MemoryEfficientSwish-453          [-1, 336, 40, 40]               0
+       ZeroPad2d-454          [-1, 336, 41, 41]               0
+Conv2dStaticSamePadding-455          [-1, 336, 20, 20]           3,024
+     BatchNorm2d-456          [-1, 336, 20, 20]             672
+MemoryEfficientSwish-457          [-1, 336, 20, 20]               0
+AdaptiveAvgPool2d-458           [-1, 336, 20, 1]               0
+AdaptiveAvgPool2d-459           [-1, 336, 1, 20]               0
+          Conv2d-460            [-1, 10, 40, 1]           3,370
+     BatchNorm2d-461            [-1, 10, 40, 1]              20
+           ReLU6-462            [-1, 10, 40, 1]               0
+       h_sigmoid-463            [-1, 10, 40, 1]               0
+         h_swish-464            [-1, 10, 40, 1]               0
+          Conv2d-465           [-1, 336, 20, 1]           3,696
+          Conv2d-466           [-1, 336, 1, 20]           3,696
+        Identity-467          [-1, 336, 20, 20]               0
+Conv2dStaticSamePadding-468          [-1, 112, 20, 20]          37,632
+          Conv2d-469           [-1, 672, 1, 20]          14,784
+     BatchNorm2d-470          [-1, 112, 20, 20]             224
+        Identity-471          [-1, 672, 20, 20]               0
+     MBConvBlock-472          [-1, 112, 20, 20]               0
+        Identity-473          [-1, 112, 20, 20]               0
+Conv2dStaticSamePadding-474          [-1, 672, 20, 20]          75,264
+     BatchNorm2d-475          [-1, 672, 20, 20]           1,344
+MemoryEfficientSwish-476          [-1, 672, 20, 20]               0
+       ZeroPad2d-477          [-1, 672, 22, 22]               0
+Conv2dStaticSamePadding-478          [-1, 672, 20, 20]           6,048
+     BatchNorm2d-479          [-1, 672, 20, 20]           1,344
+MemoryEfficientSwish-480          [-1, 672, 20, 20]               0
+AdaptiveAvgPool2d-481           [-1, 672, 20, 1]               0
+AdaptiveAvgPool2d-482           [-1, 672, 1, 20]               0
+          Conv2d-483            [-1, 21, 40, 1]          14,133
+     BatchNorm2d-484            [-1, 21, 40, 1]              42
+           ReLU6-485            [-1, 21, 40, 1]               0
+       h_sigmoid-486            [-1, 21, 40, 1]               0
+         h_swish-487            [-1, 21, 40, 1]               0
+          Conv2d-488           [-1, 672, 20, 1]          14,784
+Conv2dStaticSamePadding-489          [-1, 112, 20, 20]          75,264
+          Conv2d-490           [-1, 672, 1, 20]          14,784
+     BatchNorm2d-491          [-1, 112, 20, 20]             224
+        Identity-492          [-1, 672, 20, 20]               0
+     MBConvBlock-493          [-1, 112, 20, 20]               0
+        Identity-494          [-1, 112, 20, 20]               0
+Conv2dStaticSamePadding-495          [-1, 112, 20, 20]          75,264
+Conv2dStaticSamePadding-496          [-1, 672, 20, 20]          75,264
+     BatchNorm2d-497          [-1, 112, 20, 20]             224
+     BatchNorm2d-498          [-1, 672, 20, 20]           1,344
+MemoryEfficientSwish-499          [-1, 672, 20, 20]               0
+       ZeroPad2d-500          [-1, 672, 22, 22]               0
+Conv2dStaticSamePadding-501          [-1, 672, 20, 20]           6,048
+     MBConvBlock-502          [-1, 112, 20, 20]               0
+        Identity-503          [-1, 112, 20, 20]               0
+     BatchNorm2d-504          [-1, 672, 20, 20]           1,344
+Conv2dStaticSamePadding-505          [-1, 672, 20, 20]          75,264
+MemoryEfficientSwish-506          [-1, 672, 20, 20]               0
+AdaptiveAvgPool2d-507           [-1, 672, 20, 1]               0
+AdaptiveAvgPool2d-508           [-1, 672, 1, 20]               0
+     BatchNorm2d-509          [-1, 672, 20, 20]           1,344
+          Conv2d-510            [-1, 21, 40, 1]          14,133
+MemoryEfficientSwish-511          [-1, 672, 20, 20]               0
+       ZeroPad2d-512          [-1, 672, 22, 22]               0
+     BatchNorm2d-513            [-1, 21, 40, 1]              42
+Conv2dStaticSamePadding-514          [-1, 672, 20, 20]           6,048
+           ReLU6-515            [-1, 21, 40, 1]               0
+     BatchNorm2d-516          [-1, 672, 20, 20]           1,344
+       h_sigmoid-517            [-1, 21, 40, 1]               0
+         h_swish-518            [-1, 21, 40, 1]               0
+MemoryEfficientSwish-519          [-1, 672, 20, 20]               0
+          Conv2d-520           [-1, 672, 20, 1]          14,784
+AdaptiveAvgPool2d-521           [-1, 672, 20, 1]               0
+AdaptiveAvgPool2d-522           [-1, 672, 1, 20]               0
+          Conv2d-523           [-1, 672, 1, 20]          14,784
+          Conv2d-524            [-1, 21, 40, 1]          14,133
+        Identity-525          [-1, 672, 20, 20]               0
+Conv2dStaticSamePadding-526          [-1, 112, 20, 20]          75,264
+     BatchNorm2d-527            [-1, 21, 40, 1]              42
+     BatchNorm2d-528          [-1, 112, 20, 20]             224
+           ReLU6-529            [-1, 21, 40, 1]               0
+       h_sigmoid-530            [-1, 21, 40, 1]               0
+         h_swish-531            [-1, 21, 40, 1]               0
+     MBConvBlock-532          [-1, 112, 20, 20]               0
+        Identity-533          [-1, 112, 20, 20]               0
+          Conv2d-534           [-1, 672, 20, 1]          14,784
+Conv2dStaticSamePadding-535          [-1, 672, 20, 20]          75,264
+     BatchNorm2d-536          [-1, 672, 20, 20]           1,344
+          Conv2d-537           [-1, 672, 1, 20]          14,784
+MemoryEfficientSwish-538          [-1, 672, 20, 20]               0
+       ZeroPad2d-539          [-1, 672, 22, 22]               0
+        Identity-540          [-1, 672, 20, 20]               0
+Conv2dStaticSamePadding-541          [-1, 672, 20, 20]           6,048
+Conv2dStaticSamePadding-542          [-1, 112, 20, 20]          75,264
+     BatchNorm2d-543          [-1, 672, 20, 20]           1,344
+     BatchNorm2d-544          [-1, 112, 20, 20]             224
+MemoryEfficientSwish-545          [-1, 672, 20, 20]               0
+AdaptiveAvgPool2d-546           [-1, 672, 20, 1]               0
+AdaptiveAvgPool2d-547           [-1, 672, 1, 20]               0
+          Conv2d-548            [-1, 21, 40, 1]          14,133
+     MBConvBlock-549          [-1, 112, 20, 20]               0
+        Identity-550          [-1, 112, 20, 20]               0
+Conv2dStaticSamePadding-551          [-1, 672, 20, 20]          75,264
+     BatchNorm2d-552            [-1, 21, 40, 1]              42
+     BatchNorm2d-553          [-1, 672, 20, 20]           1,344
+           ReLU6-554            [-1, 21, 40, 1]               0
+MemoryEfficientSwish-555          [-1, 672, 20, 20]               0
+       h_sigmoid-556            [-1, 21, 40, 1]               0
+         h_swish-557            [-1, 21, 40, 1]               0
+       ZeroPad2d-558          [-1, 672, 22, 22]               0
+Conv2dStaticSamePadding-559          [-1, 672, 20, 20]           6,048
+          Conv2d-560           [-1, 672, 20, 1]          14,784
+     BatchNorm2d-561          [-1, 672, 20, 20]           1,344
+          Conv2d-562           [-1, 672, 1, 20]          14,784
+MemoryEfficientSwish-563          [-1, 672, 20, 20]               0
+AdaptiveAvgPool2d-564           [-1, 672, 20, 1]               0
+AdaptiveAvgPool2d-565           [-1, 672, 1, 20]               0
+        Identity-566          [-1, 672, 20, 20]               0
+          Conv2d-567            [-1, 21, 40, 1]          14,133
+Conv2dStaticSamePadding-568          [-1, 112, 20, 20]          75,264
+     BatchNorm2d-569          [-1, 112, 20, 20]             224
+     BatchNorm2d-570            [-1, 21, 40, 1]              42
+           ReLU6-571            [-1, 21, 40, 1]               0
+       h_sigmoid-572            [-1, 21, 40, 1]               0
+         h_swish-573            [-1, 21, 40, 1]               0
+     MBConvBlock-574          [-1, 112, 20, 20]               0
+        Identity-575          [-1, 112, 20, 20]               0
+          Conv2d-576           [-1, 672, 20, 1]          14,784
+Conv2dStaticSamePadding-577          [-1, 672, 20, 20]          75,264
+     BatchNorm2d-578          [-1, 672, 20, 20]           1,344
+          Conv2d-579           [-1, 672, 1, 20]          14,784
+MemoryEfficientSwish-580          [-1, 672, 20, 20]               0
+       ZeroPad2d-581          [-1, 672, 22, 22]               0
+        Identity-582          [-1, 672, 20, 20]               0
+Conv2dStaticSamePadding-583          [-1, 672, 20, 20]           6,048
+Conv2dStaticSamePadding-584          [-1, 112, 20, 20]          75,264
+     BatchNorm2d-585          [-1, 672, 20, 20]           1,344
+     BatchNorm2d-586          [-1, 112, 20, 20]             224
+MemoryEfficientSwish-587          [-1, 672, 20, 20]               0
+AdaptiveAvgPool2d-588           [-1, 672, 20, 1]               0
+AdaptiveAvgPool2d-589           [-1, 672, 1, 20]               0
+     MBConvBlock-590          [-1, 112, 20, 20]               0
+        Identity-591          [-1, 112, 20, 20]               0
+          Conv2d-592            [-1, 21, 40, 1]          14,133
+Conv2dStaticSamePadding-593          [-1, 672, 20, 20]          75,264
+     BatchNorm2d-594          [-1, 672, 20, 20]           1,344
+     BatchNorm2d-595            [-1, 21, 40, 1]              42
+MemoryEfficientSwish-596          [-1, 672, 20, 20]               0
+           ReLU6-597            [-1, 21, 40, 1]               0
+       ZeroPad2d-598          [-1, 672, 22, 22]               0
+       h_sigmoid-599            [-1, 21, 40, 1]               0
+Conv2dStaticSamePadding-600          [-1, 672, 20, 20]           6,048
+         h_swish-601            [-1, 21, 40, 1]               0
+     BatchNorm2d-602          [-1, 672, 20, 20]           1,344
+          Conv2d-603           [-1, 672, 20, 1]          14,784
+MemoryEfficientSwish-604          [-1, 672, 20, 20]               0
+AdaptiveAvgPool2d-605           [-1, 672, 20, 1]               0
+          Conv2d-606           [-1, 672, 1, 20]          14,784
+AdaptiveAvgPool2d-607           [-1, 672, 1, 20]               0
+        Identity-608          [-1, 672, 20, 20]               0
+          Conv2d-609            [-1, 21, 40, 1]          14,133
+Conv2dStaticSamePadding-610          [-1, 112, 20, 20]          75,264
+     BatchNorm2d-611          [-1, 112, 20, 20]             224
+     BatchNorm2d-612            [-1, 21, 40, 1]              42
+           ReLU6-613            [-1, 21, 40, 1]               0
+       h_sigmoid-614            [-1, 21, 40, 1]               0
+         h_swish-615            [-1, 21, 40, 1]               0
+     MBConvBlock-616          [-1, 112, 20, 20]               0
+        Identity-617          [-1, 112, 20, 20]               0
+Conv2dStaticSamePadding-618          [-1, 672, 20, 20]          75,264
+          Conv2d-619           [-1, 672, 20, 1]          14,784
+     BatchNorm2d-620          [-1, 672, 20, 20]           1,344
+          Conv2d-621           [-1, 672, 1, 20]          14,784
+MemoryEfficientSwish-622          [-1, 672, 20, 20]               0
+       ZeroPad2d-623          [-1, 672, 22, 22]               0
+Conv2dStaticSamePadding-624          [-1, 672, 20, 20]           6,048
+        Identity-625          [-1, 672, 20, 20]               0
+Conv2dStaticSamePadding-626          [-1, 112, 20, 20]          75,264
+     BatchNorm2d-627          [-1, 672, 20, 20]           1,344
+     BatchNorm2d-628          [-1, 112, 20, 20]             224
+MemoryEfficientSwish-629          [-1, 672, 20, 20]               0
+AdaptiveAvgPool2d-630           [-1, 672, 20, 1]               0
+AdaptiveAvgPool2d-631           [-1, 672, 1, 20]               0
+     MBConvBlock-632          [-1, 112, 20, 20]               0
+        Identity-633          [-1, 112, 20, 20]               0
+          Conv2d-634            [-1, 21, 40, 1]          14,133
+Conv2dStaticSamePadding-635          [-1, 672, 20, 20]          75,264
+     BatchNorm2d-636          [-1, 672, 20, 20]           1,344
+     BatchNorm2d-637            [-1, 21, 40, 1]              42
+MemoryEfficientSwish-638          [-1, 672, 20, 20]               0
+           ReLU6-639            [-1, 21, 40, 1]               0
+       ZeroPad2d-640          [-1, 672, 22, 22]               0
+       h_sigmoid-641            [-1, 21, 40, 1]               0
+Conv2dStaticSamePadding-642          [-1, 672, 20, 20]           6,048
+         h_swish-643            [-1, 21, 40, 1]               0
+     BatchNorm2d-644          [-1, 672, 20, 20]           1,344
+          Conv2d-645           [-1, 672, 20, 1]          14,784
+MemoryEfficientSwish-646          [-1, 672, 20, 20]               0
+AdaptiveAvgPool2d-647           [-1, 672, 20, 1]               0
+          Conv2d-648           [-1, 672, 1, 20]          14,784
+AdaptiveAvgPool2d-649           [-1, 672, 1, 20]               0
+        Identity-650          [-1, 672, 20, 20]               0
+          Conv2d-651            [-1, 21, 40, 1]          14,133
+Conv2dStaticSamePadding-652          [-1, 112, 20, 20]          75,264
+     BatchNorm2d-653            [-1, 21, 40, 1]              42
+     BatchNorm2d-654          [-1, 112, 20, 20]             224
+           ReLU6-655            [-1, 21, 40, 1]               0
+       h_sigmoid-656            [-1, 21, 40, 1]               0
+         h_swish-657            [-1, 21, 40, 1]               0
+     MBConvBlock-658          [-1, 112, 20, 20]               0
+        Identity-659          [-1, 112, 20, 20]               0
+          Conv2d-660           [-1, 672, 20, 1]          14,784
+Conv2dStaticSamePadding-661          [-1, 672, 20, 20]          75,264
+     BatchNorm2d-662          [-1, 672, 20, 20]           1,344
+          Conv2d-663           [-1, 672, 1, 20]          14,784
+MemoryEfficientSwish-664          [-1, 672, 20, 20]               0
+       ZeroPad2d-665          [-1, 672, 24, 24]               0
+        Identity-666          [-1, 672, 20, 20]               0
+Conv2dStaticSamePadding-667          [-1, 672, 20, 20]          16,800
+Conv2dStaticSamePadding-668          [-1, 112, 20, 20]          75,264
+     BatchNorm2d-669          [-1, 672, 20, 20]           1,344
+     BatchNorm2d-670          [-1, 112, 20, 20]             224
+MemoryEfficientSwish-671          [-1, 672, 20, 20]               0
+AdaptiveAvgPool2d-672           [-1, 672, 20, 1]               0
+AdaptiveAvgPool2d-673           [-1, 672, 1, 20]               0
+     MBConvBlock-674          [-1, 112, 20, 20]               0
+        Identity-675          [-1, 112, 20, 20]               0
+          Conv2d-676            [-1, 21, 40, 1]          14,133
+Conv2dStaticSamePadding-677          [-1, 672, 20, 20]          75,264
+     BatchNorm2d-678            [-1, 21, 40, 1]              42
+     BatchNorm2d-679          [-1, 672, 20, 20]           1,344
+           ReLU6-680            [-1, 21, 40, 1]               0
+MemoryEfficientSwish-681          [-1, 672, 20, 20]               0
+       h_sigmoid-682            [-1, 21, 40, 1]               0
+       ZeroPad2d-683          [-1, 672, 24, 24]               0
+         h_swish-684            [-1, 21, 40, 1]               0
+Conv2dStaticSamePadding-685          [-1, 672, 20, 20]          16,800
+          Conv2d-686           [-1, 672, 20, 1]          14,784
+     BatchNorm2d-687          [-1, 672, 20, 20]           1,344
+MemoryEfficientSwish-688          [-1, 672, 20, 20]               0
+          Conv2d-689           [-1, 672, 1, 20]          14,784
+AdaptiveAvgPool2d-690           [-1, 672, 20, 1]               0
+AdaptiveAvgPool2d-691           [-1, 672, 1, 20]               0
+        Identity-692          [-1, 672, 20, 20]               0
+          Conv2d-693            [-1, 21, 40, 1]          14,133
+     BatchNorm2d-694            [-1, 21, 40, 1]              42
+           ReLU6-695            [-1, 21, 40, 1]               0
+       h_sigmoid-696            [-1, 21, 40, 1]               0
+         h_swish-697            [-1, 21, 40, 1]               0
+          Conv2d-698           [-1, 672, 20, 1]          14,784
+          Conv2d-699           [-1, 672, 1, 20]          14,784
+        Identity-700          [-1, 672, 20, 20]               0
+Conv2dStaticSamePadding-701          [-1, 160, 20, 20]         107,520
+     BatchNorm2d-702          [-1, 160, 20, 20]             320
+     MBConvBlock-703          [-1, 160, 20, 20]               0
+        Identity-704          [-1, 160, 20, 20]               0
+Conv2dStaticSamePadding-705          [-1, 160, 20, 20]         107,520
+     BatchNorm2d-706          [-1, 160, 20, 20]             320
+     MBConvBlock-707          [-1, 160, 20, 20]               0
+        Identity-708          [-1, 160, 20, 20]               0
+Conv2dStaticSamePadding-709          [-1, 960, 20, 20]         153,600
+     BatchNorm2d-710          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-711          [-1, 960, 20, 20]               0
+       ZeroPad2d-712          [-1, 960, 24, 24]               0
+Conv2dStaticSamePadding-713          [-1, 960, 20, 20]          24,000
+     BatchNorm2d-714          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-715          [-1, 960, 20, 20]               0
+AdaptiveAvgPool2d-716           [-1, 960, 20, 1]               0
+AdaptiveAvgPool2d-717           [-1, 960, 1, 20]               0
+Conv2dStaticSamePadding-718          [-1, 960, 20, 20]         153,600
+     BatchNorm2d-719          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-720          [-1, 960, 20, 20]               0
+       ZeroPad2d-721          [-1, 960, 24, 24]               0
+Conv2dStaticSamePadding-722          [-1, 960, 20, 20]          24,000
+     BatchNorm2d-723          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-724          [-1, 960, 20, 20]               0
+AdaptiveAvgPool2d-725           [-1, 960, 20, 1]               0
+AdaptiveAvgPool2d-726           [-1, 960, 1, 20]               0
+          Conv2d-727            [-1, 30, 40, 1]          28,830
+     BatchNorm2d-728            [-1, 30, 40, 1]              60
+           ReLU6-729            [-1, 30, 40, 1]               0
+       h_sigmoid-730            [-1, 30, 40, 1]               0
+         h_swish-731            [-1, 30, 40, 1]               0
+          Conv2d-732           [-1, 960, 20, 1]          29,760
+          Conv2d-733            [-1, 30, 40, 1]          28,830
+     BatchNorm2d-734            [-1, 30, 40, 1]              60
+           ReLU6-735            [-1, 30, 40, 1]               0
+       h_sigmoid-736            [-1, 30, 40, 1]               0
+         h_swish-737            [-1, 30, 40, 1]               0
+          Conv2d-738           [-1, 960, 20, 1]          29,760
+          Conv2d-739           [-1, 960, 1, 20]          29,760
+        Identity-740          [-1, 960, 20, 20]               0
+          Conv2d-741           [-1, 960, 1, 20]          29,760
+        Identity-742          [-1, 960, 20, 20]               0
+Conv2dStaticSamePadding-743          [-1, 160, 20, 20]         153,600
+     BatchNorm2d-744          [-1, 160, 20, 20]             320
+     MBConvBlock-745          [-1, 160, 20, 20]               0
+        Identity-746          [-1, 160, 20, 20]               0
+Conv2dStaticSamePadding-747          [-1, 960, 20, 20]         153,600
+     BatchNorm2d-748          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-749          [-1, 960, 20, 20]               0
+       ZeroPad2d-750          [-1, 960, 24, 24]               0
+Conv2dStaticSamePadding-751          [-1, 960, 20, 20]          24,000
+     BatchNorm2d-752          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-753          [-1, 960, 20, 20]               0
+AdaptiveAvgPool2d-754           [-1, 960, 20, 1]               0
+AdaptiveAvgPool2d-755           [-1, 960, 1, 20]               0
+          Conv2d-756            [-1, 30, 40, 1]          28,830
+     BatchNorm2d-757            [-1, 30, 40, 1]              60
+           ReLU6-758            [-1, 30, 40, 1]               0
+       h_sigmoid-759            [-1, 30, 40, 1]               0
+         h_swish-760            [-1, 30, 40, 1]               0
+          Conv2d-761           [-1, 960, 20, 1]          29,760
+          Conv2d-762           [-1, 960, 1, 20]          29,760
+        Identity-763          [-1, 960, 20, 20]               0
+Conv2dStaticSamePadding-764          [-1, 160, 20, 20]         153,600
+Conv2dStaticSamePadding-765          [-1, 160, 20, 20]         153,600
+     BatchNorm2d-766          [-1, 160, 20, 20]             320
+     BatchNorm2d-767          [-1, 160, 20, 20]             320
+     MBConvBlock-768          [-1, 160, 20, 20]               0
+        Identity-769          [-1, 160, 20, 20]               0
+Conv2dStaticSamePadding-770          [-1, 960, 20, 20]         153,600
+     MBConvBlock-771          [-1, 160, 20, 20]               0
+        Identity-772          [-1, 160, 20, 20]               0
+     BatchNorm2d-773          [-1, 960, 20, 20]           1,920
+Conv2dStaticSamePadding-774          [-1, 960, 20, 20]         153,600
+MemoryEfficientSwish-775          [-1, 960, 20, 20]               0
+     BatchNorm2d-776          [-1, 960, 20, 20]           1,920
+       ZeroPad2d-777          [-1, 960, 24, 24]               0
+Conv2dStaticSamePadding-778          [-1, 960, 20, 20]          24,000
+MemoryEfficientSwish-779          [-1, 960, 20, 20]               0
+       ZeroPad2d-780          [-1, 960, 24, 24]               0
+     BatchNorm2d-781          [-1, 960, 20, 20]           1,920
+Conv2dStaticSamePadding-782          [-1, 960, 20, 20]          24,000
+MemoryEfficientSwish-783          [-1, 960, 20, 20]               0
+     BatchNorm2d-784          [-1, 960, 20, 20]           1,920
+AdaptiveAvgPool2d-785           [-1, 960, 20, 1]               0
+AdaptiveAvgPool2d-786           [-1, 960, 1, 20]               0
+MemoryEfficientSwish-787          [-1, 960, 20, 20]               0
+          Conv2d-788            [-1, 30, 40, 1]          28,830
+AdaptiveAvgPool2d-789           [-1, 960, 20, 1]               0
+AdaptiveAvgPool2d-790           [-1, 960, 1, 20]               0
+     BatchNorm2d-791            [-1, 30, 40, 1]              60
+           ReLU6-792            [-1, 30, 40, 1]               0
+          Conv2d-793            [-1, 30, 40, 1]          28,830
+       h_sigmoid-794            [-1, 30, 40, 1]               0
+         h_swish-795            [-1, 30, 40, 1]               0
+          Conv2d-796           [-1, 960, 20, 1]          29,760
+     BatchNorm2d-797            [-1, 30, 40, 1]              60
+           ReLU6-798            [-1, 30, 40, 1]               0
+          Conv2d-799           [-1, 960, 1, 20]          29,760
+       h_sigmoid-800            [-1, 30, 40, 1]               0
+         h_swish-801            [-1, 30, 40, 1]               0
+        Identity-802          [-1, 960, 20, 20]               0
+          Conv2d-803           [-1, 960, 20, 1]          29,760
+Conv2dStaticSamePadding-804          [-1, 160, 20, 20]         153,600
+     BatchNorm2d-805          [-1, 160, 20, 20]             320
+          Conv2d-806           [-1, 960, 1, 20]          29,760
+        Identity-807          [-1, 960, 20, 20]               0
+     MBConvBlock-808          [-1, 160, 20, 20]               0
+        Identity-809          [-1, 160, 20, 20]               0
+Conv2dStaticSamePadding-810          [-1, 160, 20, 20]         153,600
+Conv2dStaticSamePadding-811          [-1, 960, 20, 20]         153,600
+     BatchNorm2d-812          [-1, 160, 20, 20]             320
+     BatchNorm2d-813          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-814          [-1, 960, 20, 20]               0
+       ZeroPad2d-815          [-1, 960, 24, 24]               0
+     MBConvBlock-816          [-1, 160, 20, 20]               0
+        Identity-817          [-1, 160, 20, 20]               0
+Conv2dStaticSamePadding-818          [-1, 960, 20, 20]          24,000
+Conv2dStaticSamePadding-819          [-1, 960, 20, 20]         153,600
+     BatchNorm2d-820          [-1, 960, 20, 20]           1,920
+     BatchNorm2d-821          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-822          [-1, 960, 20, 20]               0
+MemoryEfficientSwish-823          [-1, 960, 20, 20]               0
+AdaptiveAvgPool2d-824           [-1, 960, 20, 1]               0
+AdaptiveAvgPool2d-825           [-1, 960, 1, 20]               0
+       ZeroPad2d-826          [-1, 960, 24, 24]               0
+Conv2dStaticSamePadding-827          [-1, 960, 20, 20]          24,000
+          Conv2d-828            [-1, 30, 40, 1]          28,830
+     BatchNorm2d-829          [-1, 960, 20, 20]           1,920
+     BatchNorm2d-830            [-1, 30, 40, 1]              60
+MemoryEfficientSwish-831          [-1, 960, 20, 20]               0
+           ReLU6-832            [-1, 30, 40, 1]               0
+AdaptiveAvgPool2d-833           [-1, 960, 20, 1]               0
+       h_sigmoid-834            [-1, 30, 40, 1]               0
+AdaptiveAvgPool2d-835           [-1, 960, 1, 20]               0
+         h_swish-836            [-1, 30, 40, 1]               0
+          Conv2d-837           [-1, 960, 20, 1]          29,760
+          Conv2d-838            [-1, 30, 40, 1]          28,830
+          Conv2d-839           [-1, 960, 1, 20]          29,760
+        Identity-840          [-1, 960, 20, 20]               0
+     BatchNorm2d-841            [-1, 30, 40, 1]              60
+Conv2dStaticSamePadding-842          [-1, 160, 20, 20]         153,600
+     BatchNorm2d-843          [-1, 160, 20, 20]             320
+           ReLU6-844            [-1, 30, 40, 1]               0
+       h_sigmoid-845            [-1, 30, 40, 1]               0
+         h_swish-846            [-1, 30, 40, 1]               0
+     MBConvBlock-847          [-1, 160, 20, 20]               0
+        Identity-848          [-1, 160, 20, 20]               0
+          Conv2d-849           [-1, 960, 20, 1]          29,760
+Conv2dStaticSamePadding-850          [-1, 960, 20, 20]         153,600
+     BatchNorm2d-851          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-852          [-1, 960, 20, 20]               0
+          Conv2d-853           [-1, 960, 1, 20]          29,760
+       ZeroPad2d-854          [-1, 960, 24, 24]               0
+Conv2dStaticSamePadding-855          [-1, 960, 20, 20]          24,000
+     BatchNorm2d-856          [-1, 960, 20, 20]           1,920
+        Identity-857          [-1, 960, 20, 20]               0
+MemoryEfficientSwish-858          [-1, 960, 20, 20]               0
+Conv2dStaticSamePadding-859          [-1, 160, 20, 20]         153,600
+AdaptiveAvgPool2d-860           [-1, 960, 20, 1]               0
+AdaptiveAvgPool2d-861           [-1, 960, 1, 20]               0
+          Conv2d-862            [-1, 30, 40, 1]          28,830
+     BatchNorm2d-863          [-1, 160, 20, 20]             320
+     BatchNorm2d-864            [-1, 30, 40, 1]              60
+           ReLU6-865            [-1, 30, 40, 1]               0
+       h_sigmoid-866            [-1, 30, 40, 1]               0
+         h_swish-867            [-1, 30, 40, 1]               0
+     MBConvBlock-868          [-1, 160, 20, 20]               0
+        Identity-869          [-1, 160, 20, 20]               0
+Conv2dStaticSamePadding-870          [-1, 960, 20, 20]         153,600
+          Conv2d-871           [-1, 960, 20, 1]          29,760
+          Conv2d-872           [-1, 960, 1, 20]          29,760
+     BatchNorm2d-873          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-874          [-1, 960, 20, 20]               0
+        Identity-875          [-1, 960, 20, 20]               0
+       ZeroPad2d-876          [-1, 960, 24, 24]               0
+Conv2dStaticSamePadding-877          [-1, 160, 20, 20]         153,600
+Conv2dStaticSamePadding-878          [-1, 960, 20, 20]          24,000
+     BatchNorm2d-879          [-1, 160, 20, 20]             320
+     BatchNorm2d-880          [-1, 960, 20, 20]           1,920
+     MBConvBlock-881          [-1, 160, 20, 20]               0
+        Identity-882          [-1, 160, 20, 20]               0
+MemoryEfficientSwish-883          [-1, 960, 20, 20]               0
+Conv2dStaticSamePadding-884          [-1, 960, 20, 20]         153,600
+AdaptiveAvgPool2d-885           [-1, 960, 20, 1]               0
+AdaptiveAvgPool2d-886           [-1, 960, 1, 20]               0
+     BatchNorm2d-887          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-888          [-1, 960, 20, 20]               0
+          Conv2d-889            [-1, 30, 40, 1]          28,830
+       ZeroPad2d-890          [-1, 960, 23, 23]               0
+Conv2dStaticSamePadding-891          [-1, 960, 10, 10]          24,000
+     BatchNorm2d-892          [-1, 960, 10, 10]           1,920
+     BatchNorm2d-893            [-1, 30, 40, 1]              60
+MemoryEfficientSwish-894          [-1, 960, 10, 10]               0
+AdaptiveAvgPool2d-895           [-1, 960, 10, 1]               0
+AdaptiveAvgPool2d-896           [-1, 960, 1, 10]               0
+           ReLU6-897            [-1, 30, 40, 1]               0
+       h_sigmoid-898            [-1, 30, 40, 1]               0
+         h_swish-899            [-1, 30, 40, 1]               0
+          Conv2d-900           [-1, 960, 20, 1]          29,760
+          Conv2d-901           [-1, 960, 1, 20]          29,760
+        Identity-902          [-1, 960, 20, 20]               0
+Conv2dStaticSamePadding-903          [-1, 160, 20, 20]         153,600
+     BatchNorm2d-904          [-1, 160, 20, 20]             320
+     MBConvBlock-905          [-1, 160, 20, 20]               0
+        Identity-906          [-1, 160, 20, 20]               0
+          Conv2d-907            [-1, 30, 20, 1]          28,830
+Conv2dStaticSamePadding-908          [-1, 960, 20, 20]         153,600
+     BatchNorm2d-909            [-1, 30, 20, 1]              60
+     BatchNorm2d-910          [-1, 960, 20, 20]           1,920
+           ReLU6-911            [-1, 30, 20, 1]               0
+       h_sigmoid-912            [-1, 30, 20, 1]               0
+MemoryEfficientSwish-913          [-1, 960, 20, 20]               0
+         h_swish-914            [-1, 30, 20, 1]               0
+       ZeroPad2d-915          [-1, 960, 24, 24]               0
+Conv2dStaticSamePadding-916          [-1, 960, 20, 20]          24,000
+     BatchNorm2d-917          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-918          [-1, 960, 20, 20]               0
+AdaptiveAvgPool2d-919           [-1, 960, 20, 1]               0
+AdaptiveAvgPool2d-920           [-1, 960, 1, 20]               0
+          Conv2d-921            [-1, 30, 40, 1]          28,830
+          Conv2d-922           [-1, 960, 10, 1]          29,760
+     BatchNorm2d-923            [-1, 30, 40, 1]              60
+           ReLU6-924            [-1, 30, 40, 1]               0
+       h_sigmoid-925            [-1, 30, 40, 1]               0
+         h_swish-926            [-1, 30, 40, 1]               0
+          Conv2d-927           [-1, 960, 20, 1]          29,760
+          Conv2d-928           [-1, 960, 1, 20]          29,760
+          Conv2d-929           [-1, 960, 1, 10]          29,760
+        Identity-930          [-1, 960, 20, 20]               0
+        Identity-931          [-1, 960, 10, 10]               0
+Conv2dStaticSamePadding-932          [-1, 160, 20, 20]         153,600
+     BatchNorm2d-933          [-1, 160, 20, 20]             320
+     MBConvBlock-934          [-1, 160, 20, 20]               0
+        Identity-935          [-1, 160, 20, 20]               0
+Conv2dStaticSamePadding-936          [-1, 960, 20, 20]         153,600
+     BatchNorm2d-937          [-1, 960, 20, 20]           1,920
+MemoryEfficientSwish-938          [-1, 960, 20, 20]               0
+       ZeroPad2d-939          [-1, 960, 23, 23]               0
+Conv2dStaticSamePadding-940          [-1, 960, 10, 10]          24,000
+     BatchNorm2d-941          [-1, 960, 10, 10]           1,920
+MemoryEfficientSwish-942          [-1, 960, 10, 10]               0
+AdaptiveAvgPool2d-943           [-1, 960, 10, 1]               0
+AdaptiveAvgPool2d-944           [-1, 960, 1, 10]               0
+          Conv2d-945            [-1, 30, 20, 1]          28,830
+     BatchNorm2d-946            [-1, 30, 20, 1]              60
+           ReLU6-947            [-1, 30, 20, 1]               0
+Conv2dStaticSamePadding-948          [-1, 272, 10, 10]         261,120
+       h_sigmoid-949            [-1, 30, 20, 1]               0
+         h_swish-950            [-1, 30, 20, 1]               0
+     BatchNorm2d-951          [-1, 272, 10, 10]             544
+     MBConvBlock-952          [-1, 272, 10, 10]               0
+        Identity-953          [-1, 272, 10, 10]               0
+          Conv2d-954           [-1, 960, 10, 1]          29,760
+          Conv2d-955           [-1, 960, 1, 10]          29,760
+        Identity-956          [-1, 960, 10, 10]               0
+Conv2dStaticSamePadding-957          [-1, 272, 10, 10]         261,120
+     BatchNorm2d-958          [-1, 272, 10, 10]             544
+     MBConvBlock-959          [-1, 272, 10, 10]               0
+        Identity-960          [-1, 272, 10, 10]               0
+Conv2dStaticSamePadding-961         [-1, 1632, 10, 10]         443,904
+     BatchNorm2d-962         [-1, 1632, 10, 10]           3,264
+MemoryEfficientSwish-963         [-1, 1632, 10, 10]               0
+Conv2dStaticSamePadding-964         [-1, 1632, 10, 10]         443,904
+       ZeroPad2d-965         [-1, 1632, 14, 14]               0
+Conv2dStaticSamePadding-966         [-1, 1632, 10, 10]          40,800
+     BatchNorm2d-967         [-1, 1632, 10, 10]           3,264
+     BatchNorm2d-968         [-1, 1632, 10, 10]           3,264
+MemoryEfficientSwish-969         [-1, 1632, 10, 10]               0
+MemoryEfficientSwish-970         [-1, 1632, 10, 10]               0
+       ZeroPad2d-971         [-1, 1632, 14, 14]               0
+AdaptiveAvgPool2d-972          [-1, 1632, 10, 1]               0
+Conv2dStaticSamePadding-973         [-1, 1632, 10, 10]          40,800
+AdaptiveAvgPool2d-974          [-1, 1632, 1, 10]               0
+     BatchNorm2d-975         [-1, 1632, 10, 10]           3,264
+MemoryEfficientSwish-976         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-977          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-978          [-1, 1632, 1, 10]               0
+          Conv2d-979            [-1, 51, 20, 1]          83,283
+     BatchNorm2d-980            [-1, 51, 20, 1]             102
+           ReLU6-981            [-1, 51, 20, 1]               0
+       h_sigmoid-982            [-1, 51, 20, 1]               0
+         h_swish-983            [-1, 51, 20, 1]               0
+          Conv2d-984            [-1, 51, 20, 1]          83,283
+     BatchNorm2d-985            [-1, 51, 20, 1]             102
+           ReLU6-986            [-1, 51, 20, 1]               0
+       h_sigmoid-987            [-1, 51, 20, 1]               0
+         h_swish-988            [-1, 51, 20, 1]               0
+          Conv2d-989          [-1, 1632, 10, 1]          84,864
+          Conv2d-990          [-1, 1632, 10, 1]          84,864
+          Conv2d-991          [-1, 1632, 1, 10]          84,864
+        Identity-992         [-1, 1632, 10, 10]               0
+          Conv2d-993          [-1, 1632, 1, 10]          84,864
+        Identity-994         [-1, 1632, 10, 10]               0
+Conv2dStaticSamePadding-995          [-1, 272, 10, 10]         443,904
+     BatchNorm2d-996          [-1, 272, 10, 10]             544
+     MBConvBlock-997          [-1, 272, 10, 10]               0
+        Identity-998          [-1, 272, 10, 10]               0
+Conv2dStaticSamePadding-999         [-1, 1632, 10, 10]         443,904
+    BatchNorm2d-1000         [-1, 1632, 10, 10]           3,264
+MemoryEfficientSwish-1001         [-1, 1632, 10, 10]               0
+      ZeroPad2d-1002         [-1, 1632, 14, 14]               0
+Conv2dStaticSamePadding-1003         [-1, 1632, 10, 10]          40,800
+    BatchNorm2d-1004         [-1, 1632, 10, 10]           3,264
+Conv2dStaticSamePadding-1005          [-1, 272, 10, 10]         443,904
+MemoryEfficientSwish-1006         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-1007          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-1008          [-1, 1632, 1, 10]               0
+    BatchNorm2d-1009          [-1, 272, 10, 10]             544
+         Conv2d-1010            [-1, 51, 20, 1]          83,283
+    BatchNorm2d-1011            [-1, 51, 20, 1]             102
+          ReLU6-1012            [-1, 51, 20, 1]               0
+    MBConvBlock-1013          [-1, 272, 10, 10]               0
+       Identity-1014          [-1, 272, 10, 10]               0
+      h_sigmoid-1015            [-1, 51, 20, 1]               0
+        h_swish-1016            [-1, 51, 20, 1]               0
+Conv2dStaticSamePadding-1017         [-1, 1632, 10, 10]         443,904
+         Conv2d-1018          [-1, 1632, 10, 1]          84,864
+    BatchNorm2d-1019         [-1, 1632, 10, 10]           3,264
+         Conv2d-1020          [-1, 1632, 1, 10]          84,864
+MemoryEfficientSwish-1021         [-1, 1632, 10, 10]               0
+      ZeroPad2d-1022         [-1, 1632, 14, 14]               0
+       Identity-1023         [-1, 1632, 10, 10]               0
+Conv2dStaticSamePadding-1024         [-1, 1632, 10, 10]          40,800
+Conv2dStaticSamePadding-1025          [-1, 272, 10, 10]         443,904
+    BatchNorm2d-1026         [-1, 1632, 10, 10]           3,264
+    BatchNorm2d-1027          [-1, 272, 10, 10]             544
+MemoryEfficientSwish-1028         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-1029          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-1030          [-1, 1632, 1, 10]               0
+    MBConvBlock-1031          [-1, 272, 10, 10]               0
+       Identity-1032          [-1, 272, 10, 10]               0
+Conv2dStaticSamePadding-1033         [-1, 1632, 10, 10]         443,904
+         Conv2d-1034            [-1, 51, 20, 1]          83,283
+    BatchNorm2d-1035         [-1, 1632, 10, 10]           3,264
+    BatchNorm2d-1036            [-1, 51, 20, 1]             102
+MemoryEfficientSwish-1037         [-1, 1632, 10, 10]               0
+          ReLU6-1038            [-1, 51, 20, 1]               0
+      ZeroPad2d-1039         [-1, 1632, 14, 14]               0
+      h_sigmoid-1040            [-1, 51, 20, 1]               0
+Conv2dStaticSamePadding-1041         [-1, 1632, 10, 10]          40,800
+        h_swish-1042            [-1, 51, 20, 1]               0
+    BatchNorm2d-1043         [-1, 1632, 10, 10]           3,264
+         Conv2d-1044          [-1, 1632, 10, 1]          84,864
+MemoryEfficientSwish-1045         [-1, 1632, 10, 10]               0
+         Conv2d-1046          [-1, 1632, 1, 10]          84,864
+AdaptiveAvgPool2d-1047          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-1048          [-1, 1632, 1, 10]               0
+       Identity-1049         [-1, 1632, 10, 10]               0
+         Conv2d-1050            [-1, 51, 20, 1]          83,283
+Conv2dStaticSamePadding-1051          [-1, 272, 10, 10]         443,904
+    BatchNorm2d-1052            [-1, 51, 20, 1]             102
+    BatchNorm2d-1053          [-1, 272, 10, 10]             544
+          ReLU6-1054            [-1, 51, 20, 1]               0
+      h_sigmoid-1055            [-1, 51, 20, 1]               0
+        h_swish-1056            [-1, 51, 20, 1]               0
+    MBConvBlock-1057          [-1, 272, 10, 10]               0
+       Identity-1058          [-1, 272, 10, 10]               0
+         Conv2d-1059          [-1, 1632, 10, 1]          84,864
+Conv2dStaticSamePadding-1060         [-1, 1632, 10, 10]         443,904
+    BatchNorm2d-1061         [-1, 1632, 10, 10]           3,264
+         Conv2d-1062          [-1, 1632, 1, 10]          84,864
+MemoryEfficientSwish-1063         [-1, 1632, 10, 10]               0
+      ZeroPad2d-1064         [-1, 1632, 14, 14]               0
+       Identity-1065         [-1, 1632, 10, 10]               0
+Conv2dStaticSamePadding-1066         [-1, 1632, 10, 10]          40,800
+Conv2dStaticSamePadding-1067          [-1, 272, 10, 10]         443,904
+    BatchNorm2d-1068         [-1, 1632, 10, 10]           3,264
+    BatchNorm2d-1069          [-1, 272, 10, 10]             544
+MemoryEfficientSwish-1070         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-1071          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-1072          [-1, 1632, 1, 10]               0
+    MBConvBlock-1073          [-1, 272, 10, 10]               0
+       Identity-1074          [-1, 272, 10, 10]               0
+Conv2dStaticSamePadding-1075         [-1, 1632, 10, 10]         443,904
+         Conv2d-1076            [-1, 51, 20, 1]          83,283
+    BatchNorm2d-1077         [-1, 1632, 10, 10]           3,264
+    BatchNorm2d-1078            [-1, 51, 20, 1]             102
+MemoryEfficientSwish-1079         [-1, 1632, 10, 10]               0
+          ReLU6-1080            [-1, 51, 20, 1]               0
+      ZeroPad2d-1081         [-1, 1632, 14, 14]               0
+      h_sigmoid-1082            [-1, 51, 20, 1]               0
+Conv2dStaticSamePadding-1083         [-1, 1632, 10, 10]          40,800
+        h_swish-1084            [-1, 51, 20, 1]               0
+    BatchNorm2d-1085         [-1, 1632, 10, 10]           3,264
+         Conv2d-1086          [-1, 1632, 10, 1]          84,864
+MemoryEfficientSwish-1087         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-1088          [-1, 1632, 10, 1]               0
+         Conv2d-1089          [-1, 1632, 1, 10]          84,864
+AdaptiveAvgPool2d-1090          [-1, 1632, 1, 10]               0
+       Identity-1091         [-1, 1632, 10, 10]               0
+         Conv2d-1092            [-1, 51, 20, 1]          83,283
+Conv2dStaticSamePadding-1093          [-1, 272, 10, 10]         443,904
+    BatchNorm2d-1094            [-1, 51, 20, 1]             102
+    BatchNorm2d-1095          [-1, 272, 10, 10]             544
+          ReLU6-1096            [-1, 51, 20, 1]               0
+      h_sigmoid-1097            [-1, 51, 20, 1]               0
+        h_swish-1098            [-1, 51, 20, 1]               0
+         Conv2d-1099          [-1, 1632, 10, 1]          84,864
+    MBConvBlock-1100          [-1, 272, 10, 10]               0
+       Identity-1101          [-1, 272, 10, 10]               0
+Conv2dStaticSamePadding-1102         [-1, 1632, 10, 10]         443,904
+         Conv2d-1103          [-1, 1632, 1, 10]          84,864
+    BatchNorm2d-1104         [-1, 1632, 10, 10]           3,264
+       Identity-1105         [-1, 1632, 10, 10]               0
+Conv2dStaticSamePadding-1106          [-1, 272, 10, 10]         443,904
+MemoryEfficientSwish-1107         [-1, 1632, 10, 10]               0
+      ZeroPad2d-1108         [-1, 1632, 14, 14]               0
+    BatchNorm2d-1109          [-1, 272, 10, 10]             544
+Conv2dStaticSamePadding-1110         [-1, 1632, 10, 10]          40,800
+    MBConvBlock-1111          [-1, 272, 10, 10]               0
+       Identity-1112          [-1, 272, 10, 10]               0
+    BatchNorm2d-1113         [-1, 1632, 10, 10]           3,264
+Conv2dStaticSamePadding-1114         [-1, 1632, 10, 10]         443,904
+MemoryEfficientSwish-1115         [-1, 1632, 10, 10]               0
+    BatchNorm2d-1116         [-1, 1632, 10, 10]           3,264
+AdaptiveAvgPool2d-1117          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-1118          [-1, 1632, 1, 10]               0
+MemoryEfficientSwish-1119         [-1, 1632, 10, 10]               0
+      ZeroPad2d-1120         [-1, 1632, 14, 14]               0
+Conv2dStaticSamePadding-1121         [-1, 1632, 10, 10]          40,800
+         Conv2d-1122            [-1, 51, 20, 1]          83,283
+    BatchNorm2d-1123         [-1, 1632, 10, 10]           3,264
+    BatchNorm2d-1124            [-1, 51, 20, 1]             102
+MemoryEfficientSwish-1125         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-1126          [-1, 1632, 10, 1]               0
+          ReLU6-1127            [-1, 51, 20, 1]               0
+AdaptiveAvgPool2d-1128          [-1, 1632, 1, 10]               0
+      h_sigmoid-1129            [-1, 51, 20, 1]               0
+        h_swish-1130            [-1, 51, 20, 1]               0
+         Conv2d-1131            [-1, 51, 20, 1]          83,283
+         Conv2d-1132          [-1, 1632, 10, 1]          84,864
+    BatchNorm2d-1133            [-1, 51, 20, 1]             102
+          ReLU6-1134            [-1, 51, 20, 1]               0
+      h_sigmoid-1135            [-1, 51, 20, 1]               0
+        h_swish-1136            [-1, 51, 20, 1]               0
+         Conv2d-1137          [-1, 1632, 1, 10]          84,864
+         Conv2d-1138          [-1, 1632, 10, 1]          84,864
+       Identity-1139         [-1, 1632, 10, 10]               0
+         Conv2d-1140          [-1, 1632, 1, 10]          84,864
+Conv2dStaticSamePadding-1141          [-1, 272, 10, 10]         443,904
+       Identity-1142         [-1, 1632, 10, 10]               0
+    BatchNorm2d-1143          [-1, 272, 10, 10]             544
+Conv2dStaticSamePadding-1144          [-1, 272, 10, 10]         443,904
+    BatchNorm2d-1145          [-1, 272, 10, 10]             544
+    MBConvBlock-1146          [-1, 272, 10, 10]               0
+       Identity-1147          [-1, 272, 10, 10]               0
+Conv2dStaticSamePadding-1148         [-1, 1632, 10, 10]         443,904
+    MBConvBlock-1149          [-1, 272, 10, 10]               0
+       Identity-1150          [-1, 272, 10, 10]               0
+Conv2dStaticSamePadding-1151         [-1, 1632, 10, 10]         443,904
+    BatchNorm2d-1152         [-1, 1632, 10, 10]           3,264
+    BatchNorm2d-1153         [-1, 1632, 10, 10]           3,264
+MemoryEfficientSwish-1154         [-1, 1632, 10, 10]               0
+MemoryEfficientSwish-1155         [-1, 1632, 10, 10]               0
+      ZeroPad2d-1156         [-1, 1632, 14, 14]               0
+      ZeroPad2d-1157         [-1, 1632, 14, 14]               0
+Conv2dStaticSamePadding-1158         [-1, 1632, 10, 10]          40,800
+Conv2dStaticSamePadding-1159         [-1, 1632, 10, 10]          40,800
+    BatchNorm2d-1160         [-1, 1632, 10, 10]           3,264
+    BatchNorm2d-1161         [-1, 1632, 10, 10]           3,264
+MemoryEfficientSwish-1162         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-1163          [-1, 1632, 10, 1]               0
+MemoryEfficientSwish-1164         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-1165          [-1, 1632, 1, 10]               0
+AdaptiveAvgPool2d-1166          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-1167          [-1, 1632, 1, 10]               0
+         Conv2d-1168            [-1, 51, 20, 1]          83,283
+         Conv2d-1169            [-1, 51, 20, 1]          83,283
+    BatchNorm2d-1170            [-1, 51, 20, 1]             102
+          ReLU6-1171            [-1, 51, 20, 1]               0
+      h_sigmoid-1172            [-1, 51, 20, 1]               0
+    BatchNorm2d-1173            [-1, 51, 20, 1]             102
+        h_swish-1174            [-1, 51, 20, 1]               0
+         Conv2d-1175          [-1, 1632, 10, 1]          84,864
+          ReLU6-1176            [-1, 51, 20, 1]               0
+      h_sigmoid-1177            [-1, 51, 20, 1]               0
+        h_swish-1178            [-1, 51, 20, 1]               0
+         Conv2d-1179          [-1, 1632, 1, 10]          84,864
+         Conv2d-1180          [-1, 1632, 10, 1]          84,864
+       Identity-1181         [-1, 1632, 10, 10]               0
+Conv2dStaticSamePadding-1182          [-1, 272, 10, 10]         443,904
+         Conv2d-1183          [-1, 1632, 1, 10]          84,864
+    BatchNorm2d-1184          [-1, 272, 10, 10]             544
+       Identity-1185         [-1, 1632, 10, 10]               0
+    MBConvBlock-1186          [-1, 272, 10, 10]               0
+       Identity-1187          [-1, 272, 10, 10]               0
+Conv2dStaticSamePadding-1188          [-1, 272, 10, 10]         443,904
+Conv2dStaticSamePadding-1189         [-1, 1632, 10, 10]         443,904
+    BatchNorm2d-1190         [-1, 1632, 10, 10]           3,264
+    BatchNorm2d-1191          [-1, 272, 10, 10]             544
+MemoryEfficientSwish-1192         [-1, 1632, 10, 10]               0
+      ZeroPad2d-1193         [-1, 1632, 14, 14]               0
+Conv2dStaticSamePadding-1194         [-1, 1632, 10, 10]          40,800
+    MBConvBlock-1195          [-1, 272, 10, 10]               0
+       Identity-1196          [-1, 272, 10, 10]               0
+    BatchNorm2d-1197         [-1, 1632, 10, 10]           3,264
+Conv2dStaticSamePadding-1198         [-1, 1632, 10, 10]         443,904
+MemoryEfficientSwish-1199         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-1200          [-1, 1632, 10, 1]               0
+    BatchNorm2d-1201         [-1, 1632, 10, 10]           3,264
+AdaptiveAvgPool2d-1202          [-1, 1632, 1, 10]               0
+MemoryEfficientSwish-1203         [-1, 1632, 10, 10]               0
+         Conv2d-1204            [-1, 51, 20, 1]          83,283
+      ZeroPad2d-1205         [-1, 1632, 14, 14]               0
+Conv2dStaticSamePadding-1206         [-1, 1632, 10, 10]          40,800
+    BatchNorm2d-1207            [-1, 51, 20, 1]             102
+          ReLU6-1208            [-1, 51, 20, 1]               0
+      h_sigmoid-1209            [-1, 51, 20, 1]               0
+    BatchNorm2d-1210         [-1, 1632, 10, 10]           3,264
+        h_swish-1211            [-1, 51, 20, 1]               0
+MemoryEfficientSwish-1212         [-1, 1632, 10, 10]               0
+         Conv2d-1213          [-1, 1632, 10, 1]          84,864
+AdaptiveAvgPool2d-1214          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-1215          [-1, 1632, 1, 10]               0
+         Conv2d-1216          [-1, 1632, 1, 10]          84,864
+         Conv2d-1217            [-1, 51, 20, 1]          83,283
+       Identity-1218         [-1, 1632, 10, 10]               0
+Conv2dStaticSamePadding-1219          [-1, 272, 10, 10]         443,904
+    BatchNorm2d-1220            [-1, 51, 20, 1]             102
+    BatchNorm2d-1221          [-1, 272, 10, 10]             544
+          ReLU6-1222            [-1, 51, 20, 1]               0
+      h_sigmoid-1223            [-1, 51, 20, 1]               0
+        h_swish-1224            [-1, 51, 20, 1]               0
+    MBConvBlock-1225          [-1, 272, 10, 10]               0
+       Identity-1226          [-1, 272, 10, 10]               0
+         Conv2d-1227          [-1, 1632, 10, 1]          84,864
+Conv2dStaticSamePadding-1228         [-1, 1632, 10, 10]         443,904
+    BatchNorm2d-1229         [-1, 1632, 10, 10]           3,264
+         Conv2d-1230          [-1, 1632, 1, 10]          84,864
+MemoryEfficientSwish-1231         [-1, 1632, 10, 10]               0
+      ZeroPad2d-1232         [-1, 1632, 12, 12]               0
+       Identity-1233         [-1, 1632, 10, 10]               0
+Conv2dStaticSamePadding-1234         [-1, 1632, 10, 10]          14,688
+Conv2dStaticSamePadding-1235          [-1, 272, 10, 10]         443,904
+    BatchNorm2d-1236         [-1, 1632, 10, 10]           3,264
+MemoryEfficientSwish-1237         [-1, 1632, 10, 10]               0
+    BatchNorm2d-1238          [-1, 272, 10, 10]             544
+AdaptiveAvgPool2d-1239          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-1240          [-1, 1632, 1, 10]               0
+         Conv2d-1241            [-1, 51, 20, 1]          83,283
+    MBConvBlock-1242          [-1, 272, 10, 10]               0
+       Identity-1243          [-1, 272, 10, 10]               0
+    BatchNorm2d-1244            [-1, 51, 20, 1]             102
+Conv2dStaticSamePadding-1245         [-1, 1632, 10, 10]         443,904
+          ReLU6-1246            [-1, 51, 20, 1]               0
+      h_sigmoid-1247            [-1, 51, 20, 1]               0
+        h_swish-1248            [-1, 51, 20, 1]               0
+    BatchNorm2d-1249         [-1, 1632, 10, 10]           3,264
+         Conv2d-1250          [-1, 1632, 10, 1]          84,864
+MemoryEfficientSwish-1251         [-1, 1632, 10, 10]               0
+         Conv2d-1252          [-1, 1632, 1, 10]          84,864
+      ZeroPad2d-1253         [-1, 1632, 14, 14]               0
+Conv2dStaticSamePadding-1254         [-1, 1632, 10, 10]          40,800
+       Identity-1255         [-1, 1632, 10, 10]               0
+    BatchNorm2d-1256         [-1, 1632, 10, 10]           3,264
+MemoryEfficientSwish-1257         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-1258          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-1259          [-1, 1632, 1, 10]               0
+         Conv2d-1260            [-1, 51, 20, 1]          83,283
+    BatchNorm2d-1261            [-1, 51, 20, 1]             102
+          ReLU6-1262            [-1, 51, 20, 1]               0
+      h_sigmoid-1263            [-1, 51, 20, 1]               0
+        h_swish-1264            [-1, 51, 20, 1]               0
+         Conv2d-1265          [-1, 1632, 10, 1]          84,864
+         Conv2d-1266          [-1, 1632, 1, 10]          84,864
+       Identity-1267         [-1, 1632, 10, 10]               0
+Conv2dStaticSamePadding-1268          [-1, 272, 10, 10]         443,904
+    BatchNorm2d-1269          [-1, 272, 10, 10]             544
+    MBConvBlock-1270          [-1, 272, 10, 10]               0
+       Identity-1271          [-1, 272, 10, 10]               0
+Conv2dStaticSamePadding-1272         [-1, 1632, 10, 10]         443,904
+    BatchNorm2d-1273         [-1, 1632, 10, 10]           3,264
+MemoryEfficientSwish-1274         [-1, 1632, 10, 10]               0
+      ZeroPad2d-1275         [-1, 1632, 12, 12]               0
+Conv2dStaticSamePadding-1276         [-1, 1632, 10, 10]          14,688
+    BatchNorm2d-1277         [-1, 1632, 10, 10]           3,264
+MemoryEfficientSwish-1278         [-1, 1632, 10, 10]               0
+AdaptiveAvgPool2d-1279          [-1, 1632, 10, 1]               0
+AdaptiveAvgPool2d-1280          [-1, 1632, 1, 10]               0
+         Conv2d-1281            [-1, 51, 20, 1]          83,283
+    BatchNorm2d-1282            [-1, 51, 20, 1]             102
+          ReLU6-1283            [-1, 51, 20, 1]               0
+      h_sigmoid-1284            [-1, 51, 20, 1]               0
+        h_swish-1285            [-1, 51, 20, 1]               0
+         Conv2d-1286          [-1, 1632, 10, 1]          84,864
+         Conv2d-1287          [-1, 1632, 1, 10]          84,864
+       Identity-1288         [-1, 1632, 10, 10]               0
+Conv2dStaticSamePadding-1289          [-1, 448, 10, 10]         731,136
+    BatchNorm2d-1290          [-1, 448, 10, 10]             896
+    MBConvBlock-1291          [-1, 448, 10, 10]               0
+       Identity-1292          [-1, 448, 10, 10]               0
+Conv2dStaticSamePadding-1293          [-1, 448, 10, 10]         731,136
+    BatchNorm2d-1294          [-1, 448, 10, 10]             896
+    MBConvBlock-1295          [-1, 448, 10, 10]               0
+       Identity-1296          [-1, 448, 10, 10]               0
+Conv2dStaticSamePadding-1297         [-1, 2688, 10, 10]       1,204,224
+    BatchNorm2d-1298         [-1, 2688, 10, 10]           5,376
+MemoryEfficientSwish-1299         [-1, 2688, 10, 10]               0
+      ZeroPad2d-1300         [-1, 2688, 12, 12]               0
+Conv2dStaticSamePadding-1301         [-1, 2688, 10, 10]          24,192
+    BatchNorm2d-1302         [-1, 2688, 10, 10]           5,376
+MemoryEfficientSwish-1303         [-1, 2688, 10, 10]               0
+AdaptiveAvgPool2d-1304          [-1, 2688, 10, 1]               0
+AdaptiveAvgPool2d-1305          [-1, 2688, 1, 10]               0
+Conv2dStaticSamePadding-1306         [-1, 2688, 10, 10]       1,204,224
+    BatchNorm2d-1307         [-1, 2688, 10, 10]           5,376
+MemoryEfficientSwish-1308         [-1, 2688, 10, 10]               0
+      ZeroPad2d-1309         [-1, 2688, 12, 12]               0
+Conv2dStaticSamePadding-1310         [-1, 2688, 10, 10]          24,192
+    BatchNorm2d-1311         [-1, 2688, 10, 10]           5,376
+MemoryEfficientSwish-1312         [-1, 2688, 10, 10]               0
+AdaptiveAvgPool2d-1313          [-1, 2688, 10, 1]               0
+AdaptiveAvgPool2d-1314          [-1, 2688, 1, 10]               0
+         Conv2d-1315            [-1, 84, 20, 1]         225,876
+         Conv2d-1316            [-1, 84, 20, 1]         225,876
+    BatchNorm2d-1317            [-1, 84, 20, 1]             168
+    BatchNorm2d-1318            [-1, 84, 20, 1]             168
+          ReLU6-1319            [-1, 84, 20, 1]               0
+      h_sigmoid-1320            [-1, 84, 20, 1]               0
+        h_swish-1321            [-1, 84, 20, 1]               0
+          ReLU6-1322            [-1, 84, 20, 1]               0
+      h_sigmoid-1323            [-1, 84, 20, 1]               0
+        h_swish-1324            [-1, 84, 20, 1]               0
+         Conv2d-1325          [-1, 2688, 10, 1]         228,480
+         Conv2d-1326          [-1, 2688, 10, 1]         228,480
+         Conv2d-1327          [-1, 2688, 1, 10]         228,480
+         Conv2d-1328          [-1, 2688, 1, 10]         228,480
+       Identity-1329         [-1, 2688, 10, 10]               0
+       Identity-1330         [-1, 2688, 10, 10]               0
+Conv2dStaticSamePadding-1331          [-1, 448, 10, 10]       1,204,224
+    BatchNorm2d-1332          [-1, 448, 10, 10]             896
+    MBConvBlock-1333          [-1, 448, 10, 10]               0
+EfficientNetEncoder-1334  [[-1, 10, 320, 320], [-1, 48, 160, 160], [-1, 32, 80, 80], [-1, 56, 40, 40], [-1, 160, 20, 20], [-1, 448, 10, 10]]               0
+       Identity-1335          [-1, 448, 10, 10]               0
+AdaptiveAvgPool2d-1336           [-1, 608, 20, 1]               0
+AdaptiveAvgPool2d-1337           [-1, 608, 1, 20]               0
+Conv2dStaticSamePadding-1338          [-1, 448, 10, 10]       1,204,224
+    BatchNorm2d-1339          [-1, 448, 10, 10]             896
+    MBConvBlock-1340          [-1, 448, 10, 10]               0
+EfficientNetEncoder-1341  [[-1, 10, 320, 320], [-1, 48, 160, 160], [-1, 32, 80, 80], [-1, 56, 40, 40], [-1, 160, 20, 20], [-1, 448, 10, 10]]               0
+         Conv2d-1342            [-1, 19, 40, 1]          11,571
+       Identity-1343          [-1, 448, 10, 10]               0
+    BatchNorm2d-1344            [-1, 19, 40, 1]              38
+          ReLU6-1345            [-1, 19, 40, 1]               0
+      h_sigmoid-1346            [-1, 19, 40, 1]               0
+AdaptiveAvgPool2d-1347           [-1, 608, 20, 1]               0
+        h_swish-1348            [-1, 19, 40, 1]               0
+AdaptiveAvgPool2d-1349           [-1, 608, 1, 20]               0
+         Conv2d-1350            [-1, 19, 40, 1]          11,571
+    BatchNorm2d-1351            [-1, 19, 40, 1]              38
+          ReLU6-1352            [-1, 19, 40, 1]               0
+      h_sigmoid-1353            [-1, 19, 40, 1]               0
+        h_swish-1354            [-1, 19, 40, 1]               0
+         Conv2d-1355           [-1, 608, 20, 1]          12,160
+         Conv2d-1356           [-1, 608, 20, 1]          12,160
+         Conv2d-1357           [-1, 608, 1, 20]          12,160
+         Conv2d-1358           [-1, 608, 1, 20]          12,160
+       CAModule-1359          [-1, 608, 20, 20]               0
+      Attention-1360          [-1, 608, 20, 20]               0
+       CAModule-1361          [-1, 608, 20, 20]               0
+      Attention-1362          [-1, 608, 20, 20]               0
+         Conv2d-1363          [-1, 256, 20, 20]       1,400,832
+         Conv2d-1364          [-1, 256, 20, 20]       1,400,832
+    BatchNorm2d-1365          [-1, 256, 20, 20]             512
+           ReLU-1366          [-1, 256, 20, 20]               0
+    BatchNorm2d-1367          [-1, 256, 20, 20]             512
+           ReLU-1368          [-1, 256, 20, 20]               0
+         Conv2d-1369          [-1, 256, 20, 20]         589,824
+    BatchNorm2d-1370          [-1, 256, 20, 20]             512
+           ReLU-1371          [-1, 256, 20, 20]               0
+AdaptiveAvgPool2d-1372           [-1, 256, 20, 1]               0
+AdaptiveAvgPool2d-1373           [-1, 256, 1, 20]               0
+         Conv2d-1374          [-1, 256, 20, 20]         589,824
+    BatchNorm2d-1375          [-1, 256, 20, 20]             512
+           ReLU-1376          [-1, 256, 20, 20]               0
+AdaptiveAvgPool2d-1377           [-1, 256, 20, 1]               0
+AdaptiveAvgPool2d-1378           [-1, 256, 1, 20]               0
+         Conv2d-1379             [-1, 8, 40, 1]           2,056
+    BatchNorm2d-1380             [-1, 8, 40, 1]              16
+          ReLU6-1381             [-1, 8, 40, 1]               0
+      h_sigmoid-1382             [-1, 8, 40, 1]               0
+        h_swish-1383             [-1, 8, 40, 1]               0
+         Conv2d-1384             [-1, 8, 40, 1]           2,056
+         Conv2d-1385           [-1, 256, 20, 1]           2,304
+    BatchNorm2d-1386             [-1, 8, 40, 1]              16
+          ReLU6-1387             [-1, 8, 40, 1]               0
+      h_sigmoid-1388             [-1, 8, 40, 1]               0
+        h_swish-1389             [-1, 8, 40, 1]               0
+         Conv2d-1390           [-1, 256, 20, 1]           2,304
+         Conv2d-1391           [-1, 256, 1, 20]           2,304
+       CAModule-1392          [-1, 256, 20, 20]               0
+      Attention-1393          [-1, 256, 20, 20]               0
+   DecoderBlock-1394          [-1, 256, 20, 20]               0
+         Conv2d-1395           [-1, 256, 1, 20]           2,304
+AdaptiveAvgPool2d-1396           [-1, 312, 40, 1]               0
+AdaptiveAvgPool2d-1397           [-1, 312, 1, 40]               0
+       CAModule-1398          [-1, 256, 20, 20]               0
+      Attention-1399          [-1, 256, 20, 20]               0
+   DecoderBlock-1400          [-1, 256, 20, 20]               0
+AdaptiveAvgPool2d-1401           [-1, 312, 40, 1]               0
+AdaptiveAvgPool2d-1402           [-1, 312, 1, 40]               0
+         Conv2d-1403             [-1, 9, 80, 1]           2,817
+         Conv2d-1404             [-1, 9, 80, 1]           2,817
+    BatchNorm2d-1405             [-1, 9, 80, 1]              18
+          ReLU6-1406             [-1, 9, 80, 1]               0
+    BatchNorm2d-1407             [-1, 9, 80, 1]              18
+      h_sigmoid-1408             [-1, 9, 80, 1]               0
+        h_swish-1409             [-1, 9, 80, 1]               0
+          ReLU6-1410             [-1, 9, 80, 1]               0
+      h_sigmoid-1411             [-1, 9, 80, 1]               0
+        h_swish-1412             [-1, 9, 80, 1]               0
+         Conv2d-1413           [-1, 312, 40, 1]           3,120
+         Conv2d-1414           [-1, 312, 40, 1]           3,120
+         Conv2d-1415           [-1, 312, 1, 40]           3,120
+       CAModule-1416          [-1, 312, 40, 40]               0
+      Attention-1417          [-1, 312, 40, 40]               0
+         Conv2d-1418           [-1, 312, 1, 40]           3,120
+       CAModule-1419          [-1, 312, 40, 40]               0
+      Attention-1420          [-1, 312, 40, 40]               0
+         Conv2d-1421          [-1, 128, 40, 40]         359,424
+    BatchNorm2d-1422          [-1, 128, 40, 40]             256
+           ReLU-1423          [-1, 128, 40, 40]               0
+         Conv2d-1424          [-1, 128, 40, 40]         359,424
+    BatchNorm2d-1425          [-1, 128, 40, 40]             256
+           ReLU-1426          [-1, 128, 40, 40]               0
+         Conv2d-1427          [-1, 128, 40, 40]         147,456
+    BatchNorm2d-1428          [-1, 128, 40, 40]             256
+           ReLU-1429          [-1, 128, 40, 40]               0
+AdaptiveAvgPool2d-1430           [-1, 128, 40, 1]               0
+AdaptiveAvgPool2d-1431           [-1, 128, 1, 40]               0
+         Conv2d-1432          [-1, 128, 40, 40]         147,456
+    BatchNorm2d-1433          [-1, 128, 40, 40]             256
+           ReLU-1434          [-1, 128, 40, 40]               0
+AdaptiveAvgPool2d-1435           [-1, 128, 40, 1]               0
+AdaptiveAvgPool2d-1436           [-1, 128, 1, 40]               0
+         Conv2d-1437             [-1, 8, 80, 1]           1,032
+    BatchNorm2d-1438             [-1, 8, 80, 1]              16
+          ReLU6-1439             [-1, 8, 80, 1]               0
+      h_sigmoid-1440             [-1, 8, 80, 1]               0
+        h_swish-1441             [-1, 8, 80, 1]               0
+         Conv2d-1442             [-1, 8, 80, 1]           1,032
+         Conv2d-1443           [-1, 128, 40, 1]           1,152
+    BatchNorm2d-1444             [-1, 8, 80, 1]              16
+          ReLU6-1445             [-1, 8, 80, 1]               0
+      h_sigmoid-1446             [-1, 8, 80, 1]               0
+        h_swish-1447             [-1, 8, 80, 1]               0
+         Conv2d-1448           [-1, 128, 40, 1]           1,152
+         Conv2d-1449           [-1, 128, 1, 40]           1,152
+       CAModule-1450          [-1, 128, 40, 40]               0
+      Attention-1451          [-1, 128, 40, 40]               0
+   DecoderBlock-1452          [-1, 128, 40, 40]               0
+         Conv2d-1453           [-1, 128, 1, 40]           1,152
+AdaptiveAvgPool2d-1454           [-1, 160, 80, 1]               0
+AdaptiveAvgPool2d-1455           [-1, 160, 1, 80]               0
+       CAModule-1456          [-1, 128, 40, 40]               0
+      Attention-1457          [-1, 128, 40, 40]               0
+   DecoderBlock-1458          [-1, 128, 40, 40]               0
+AdaptiveAvgPool2d-1459           [-1, 160, 80, 1]               0
+AdaptiveAvgPool2d-1460           [-1, 160, 1, 80]               0
+         Conv2d-1461            [-1, 8, 160, 1]           1,288
+         Conv2d-1462            [-1, 8, 160, 1]           1,288
+    BatchNorm2d-1463            [-1, 8, 160, 1]              16
+          ReLU6-1464            [-1, 8, 160, 1]               0
+    BatchNorm2d-1465            [-1, 8, 160, 1]              16
+      h_sigmoid-1466            [-1, 8, 160, 1]               0
+        h_swish-1467            [-1, 8, 160, 1]               0
+          ReLU6-1468            [-1, 8, 160, 1]               0
+      h_sigmoid-1469            [-1, 8, 160, 1]               0
+        h_swish-1470            [-1, 8, 160, 1]               0
+         Conv2d-1471           [-1, 160, 80, 1]           1,440
+         Conv2d-1472           [-1, 160, 80, 1]           1,440
+         Conv2d-1473           [-1, 160, 1, 80]           1,440
+       CAModule-1474          [-1, 160, 80, 80]               0
+      Attention-1475          [-1, 160, 80, 80]               0
+         Conv2d-1476           [-1, 160, 1, 80]           1,440
+       CAModule-1477          [-1, 160, 80, 80]               0
+      Attention-1478          [-1, 160, 80, 80]               0
+         Conv2d-1479           [-1, 64, 80, 80]          92,160
+    BatchNorm2d-1480           [-1, 64, 80, 80]             128
+           ReLU-1481           [-1, 64, 80, 80]               0
+         Conv2d-1482           [-1, 64, 80, 80]          92,160
+    BatchNorm2d-1483           [-1, 64, 80, 80]             128
+           ReLU-1484           [-1, 64, 80, 80]               0
+         Conv2d-1485           [-1, 64, 80, 80]          36,864
+    BatchNorm2d-1486           [-1, 64, 80, 80]             128
+           ReLU-1487           [-1, 64, 80, 80]               0
+AdaptiveAvgPool2d-1488            [-1, 64, 80, 1]               0
+AdaptiveAvgPool2d-1489            [-1, 64, 1, 80]               0
+         Conv2d-1490           [-1, 64, 80, 80]          36,864
+    BatchNorm2d-1491           [-1, 64, 80, 80]             128
+           ReLU-1492           [-1, 64, 80, 80]               0
+AdaptiveAvgPool2d-1493            [-1, 64, 80, 1]               0
+AdaptiveAvgPool2d-1494            [-1, 64, 1, 80]               0
+         Conv2d-1495            [-1, 8, 160, 1]             520
+    BatchNorm2d-1496            [-1, 8, 160, 1]              16
+          ReLU6-1497            [-1, 8, 160, 1]               0
+      h_sigmoid-1498            [-1, 8, 160, 1]               0
+        h_swish-1499            [-1, 8, 160, 1]               0
+         Conv2d-1500            [-1, 8, 160, 1]             520
+         Conv2d-1501            [-1, 64, 80, 1]             576
+    BatchNorm2d-1502            [-1, 8, 160, 1]              16
+          ReLU6-1503            [-1, 8, 160, 1]               0
+      h_sigmoid-1504            [-1, 8, 160, 1]               0
+        h_swish-1505            [-1, 8, 160, 1]               0
+         Conv2d-1506            [-1, 64, 80, 1]             576
+         Conv2d-1507            [-1, 64, 1, 80]             576
+       CAModule-1508           [-1, 64, 80, 80]               0
+      Attention-1509           [-1, 64, 80, 80]               0
+   DecoderBlock-1510           [-1, 64, 80, 80]               0
+         Conv2d-1511            [-1, 64, 1, 80]             576
+AdaptiveAvgPool2d-1512          [-1, 112, 160, 1]               0
+AdaptiveAvgPool2d-1513          [-1, 112, 1, 160]               0
+       CAModule-1514           [-1, 64, 80, 80]               0
+      Attention-1515           [-1, 64, 80, 80]               0
+   DecoderBlock-1516           [-1, 64, 80, 80]               0
+         Conv2d-1517            [-1, 8, 320, 1]             904
+AdaptiveAvgPool2d-1518          [-1, 112, 160, 1]               0
+AdaptiveAvgPool2d-1519          [-1, 112, 1, 160]               0
+    BatchNorm2d-1520            [-1, 8, 320, 1]              16
+         Conv2d-1521            [-1, 8, 320, 1]             904
+          ReLU6-1522            [-1, 8, 320, 1]               0
+      h_sigmoid-1523            [-1, 8, 320, 1]               0
+        h_swish-1524            [-1, 8, 320, 1]               0
+    BatchNorm2d-1525            [-1, 8, 320, 1]              16
+          ReLU6-1526            [-1, 8, 320, 1]               0
+      h_sigmoid-1527            [-1, 8, 320, 1]               0
+        h_swish-1528            [-1, 8, 320, 1]               0
+         Conv2d-1529          [-1, 112, 160, 1]           1,008
+         Conv2d-1530          [-1, 112, 160, 1]           1,008
+         Conv2d-1531          [-1, 112, 1, 160]           1,008
+         Conv2d-1532          [-1, 112, 1, 160]           1,008
+       CAModule-1533        [-1, 112, 160, 160]               0
+      Attention-1534        [-1, 112, 160, 160]               0
+       CAModule-1535        [-1, 112, 160, 160]               0
+      Attention-1536        [-1, 112, 160, 160]               0
+         Conv2d-1537         [-1, 32, 160, 160]          32,256
+    BatchNorm2d-1538         [-1, 32, 160, 160]              64
+           ReLU-1539         [-1, 32, 160, 160]               0
+         Conv2d-1540         [-1, 32, 160, 160]          32,256
+    BatchNorm2d-1541         [-1, 32, 160, 160]              64
+           ReLU-1542         [-1, 32, 160, 160]               0
+         Conv2d-1543         [-1, 32, 160, 160]           9,216
+    BatchNorm2d-1544         [-1, 32, 160, 160]              64
+           ReLU-1545         [-1, 32, 160, 160]               0
+AdaptiveAvgPool2d-1546           [-1, 32, 160, 1]               0
+AdaptiveAvgPool2d-1547           [-1, 32, 1, 160]               0
+         Conv2d-1548            [-1, 8, 320, 1]             264
+    BatchNorm2d-1549            [-1, 8, 320, 1]              16
+          ReLU6-1550            [-1, 8, 320, 1]               0
+      h_sigmoid-1551            [-1, 8, 320, 1]               0
+        h_swish-1552            [-1, 8, 320, 1]               0
+         Conv2d-1553           [-1, 32, 160, 1]             288
+         Conv2d-1554         [-1, 32, 160, 160]           9,216
+    BatchNorm2d-1555         [-1, 32, 160, 160]              64
+           ReLU-1556         [-1, 32, 160, 160]               0
+AdaptiveAvgPool2d-1557           [-1, 32, 160, 1]               0
+AdaptiveAvgPool2d-1558           [-1, 32, 1, 160]               0
+         Conv2d-1559            [-1, 8, 320, 1]             264
+    BatchNorm2d-1560            [-1, 8, 320, 1]              16
+          ReLU6-1561            [-1, 8, 320, 1]               0
+      h_sigmoid-1562            [-1, 8, 320, 1]               0
+        h_swish-1563            [-1, 8, 320, 1]               0
+         Conv2d-1564           [-1, 32, 160, 1]             288
+         Conv2d-1565           [-1, 32, 1, 160]             288
+       CAModule-1566         [-1, 32, 160, 160]               0
+      Attention-1567         [-1, 32, 160, 160]               0
+   DecoderBlock-1568         [-1, 32, 160, 160]               0
+         Conv2d-1569           [-1, 32, 1, 160]             288
+       CAModule-1570         [-1, 32, 160, 160]               0
+      Attention-1571         [-1, 32, 160, 160]               0
+   DecoderBlock-1572         [-1, 32, 160, 160]               0
+         Conv2d-1573         [-1, 16, 320, 320]           4,608
+    BatchNorm2d-1574         [-1, 16, 320, 320]              32
+           ReLU-1575         [-1, 16, 320, 320]               0
+         Conv2d-1576         [-1, 16, 320, 320]           4,608
+    BatchNorm2d-1577         [-1, 16, 320, 320]              32
+           ReLU-1578         [-1, 16, 320, 320]               0
+         Conv2d-1579         [-1, 16, 320, 320]           2,304
+    BatchNorm2d-1580         [-1, 16, 320, 320]              32
+           ReLU-1581         [-1, 16, 320, 320]               0
+AdaptiveAvgPool2d-1582           [-1, 16, 320, 1]               0
+AdaptiveAvgPool2d-1583           [-1, 16, 1, 320]               0
+         Conv2d-1584            [-1, 8, 640, 1]             136
+    BatchNorm2d-1585            [-1, 8, 640, 1]              16
+          ReLU6-1586            [-1, 8, 640, 1]               0
+      h_sigmoid-1587            [-1, 8, 640, 1]               0
+        h_swish-1588            [-1, 8, 640, 1]               0
+         Conv2d-1589           [-1, 16, 320, 1]             144
+         Conv2d-1590         [-1, 16, 320, 320]           2,304
+         Conv2d-1591           [-1, 16, 1, 320]             144
+    BatchNorm2d-1592         [-1, 16, 320, 320]              32
+           ReLU-1593         [-1, 16, 320, 320]               0
+AdaptiveAvgPool2d-1594           [-1, 16, 320, 1]               0
+       CAModule-1595         [-1, 16, 320, 320]               0
+      Attention-1596         [-1, 16, 320, 320]               0
+   DecoderBlock-1597         [-1, 16, 320, 320]               0
+UnetDecoderWithColor-1598         [-1, 16, 320, 320]               0
+AdaptiveAvgPool2d-1599           [-1, 16, 1, 320]               0
+         Conv2d-1600            [-1, 8, 640, 1]             136
+    BatchNorm2d-1601            [-1, 8, 640, 1]              16
+          ReLU6-1602            [-1, 8, 640, 1]               0
+      h_sigmoid-1603            [-1, 8, 640, 1]               0
+        h_swish-1604            [-1, 8, 640, 1]               0
+         Conv2d-1605           [-1, 16, 320, 1]             144
+         Conv2d-1606           [-1, 16, 1, 320]             144
+       CAModule-1607         [-1, 16, 320, 320]               0
+      Attention-1608         [-1, 16, 320, 320]               0
+   DecoderBlock-1609         [-1, 16, 320, 320]               0
+UnetDecoderWithColor-1610         [-1, 16, 320, 320]               0
+         Conv2d-1611          [-1, 1, 320, 320]             145
+         Conv2d-1612          [-1, 1, 320, 320]             145
+       Identity-1613          [-1, 1, 320, 320]               0
+       Identity-1614          [-1, 1, 320, 320]               0
+     Activation-1615          [-1, 1, 320, 320]               0
+  UnetWithColor-1616          [-1, 1, 320, 320]               0
+       Identity-1617          [-1, 1, 320, 320]               0
+       Identity-1618          [-1, 1, 320, 320]               0
+     Activation-1619          [-1, 1, 320, 320]               0
+  UnetWithColor-1620          [-1, 1, 320, 320]               0
+================================================================
+Total params: 39,821,422
+Trainable params: 39,821,422
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 2800000.00
+Forward/backward pass size (MB): 2823.60
+Params size (MB): 151.91
+Estimated Total Size (MB): 2802975.50
+----------------------------------------------------------------
+Start training

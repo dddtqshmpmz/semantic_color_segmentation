@@ -5,13 +5,14 @@ import math
 import numpy as np
 import torch
 import torch.utils.data
-from torch import le, nn, optim
+from torch import le, mode, nn, optim
 from torch.nn import functional as F
 from torchvision import datasets, transforms
 import torch.backends.cudnn as cudnn
 from torchvision.utils import save_image
 from net import MaskGenerator, ResiduePredictor
-from mydataset import MyDataset, MyDatasetIHC
+from mydataset import MyDataset, MyDatasetIHC, MyDataset365_with_IHC
+from dataParallel import BalancedDataParallel
 import pytorch_ssim
 import cv2
 import os
@@ -21,9 +22,14 @@ import lpips
 from util import psnr,ssim,reconst_loss,temp_distance,squared_mahalanobis_distance_loss,alpha_normalize,mono_color_reconst_loss,delta_E
 os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 
+# gpu_num = len(os.environ['CUDA_VISIBLE_DEVICES'].split(',') ) - 1
+# gpu0_bsz = 3
+# other_gpu_bsz = 22
+# batch_size = gpu0_bsz + gpu_num * other_gpu_bsz
+
 parser = argparse.ArgumentParser(description='baseline')
 parser.add_argument('--run_name', type=str, default='train', help='run-name. This name is used for output folder.')
-parser.add_argument('--batch_size', type=int, default=32, metavar='N',  ## 32-> 4
+parser.add_argument('--batch_size', type=int, default= 1, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')
@@ -42,7 +48,7 @@ parser.add_argument('--sparse_loss_lambda', type=float, default=0.0, # 1.0
                     help='sparse_loss lambda')
 parser.add_argument('--distance_loss_lambda', type=float, default=0.5, # 1.0 
                     help='distance_loss_lambda')
-parser.add_argument('--lpips_loss_lambda',type=float,default=0.5, 
+parser.add_argument('--lpips_loss_lambda',type=float,default=0.1, 
                     help='lpips_loss_lambda') 
 
 parser.add_argument('--save_layer_train', type=int, default=1,
@@ -76,6 +82,7 @@ cudnn.benchmark = True
 device = torch.device("cuda" if args.cuda else "cpu")
 
 train_dataset = MyDatasetIHC(args.csv_path_ihc, args.num_primary_color, mode='train')
+# train_dataset = MyDataset365_with_IHC(args.csv_path, args.csv_path_ihc, args.num_primary_color, mode = 'train')
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=args.batch_size,
@@ -88,6 +95,7 @@ train_loader = torch.utils.data.DataLoader(
 
 
 val_dataset = MyDatasetIHC(args.csv_path_ihc, args.num_primary_color, mode='val')
+# val_dataset = MyDataset365_with_IHC(args.csv_path, args.csv_path_ihc, args.num_primary_color, mode = 'val')
 val_loader = torch.utils.data.DataLoader(
     val_dataset,
     batch_size=args.batch_size,
@@ -95,6 +103,7 @@ val_loader = torch.utils.data.DataLoader(
     num_workers=args.num_workers,
     drop_last=True
     )
+
 
 mask_generator = MaskGenerator(args.num_primary_color).to(device)
 mask_generator = nn.DataParallel(mask_generator)
@@ -104,8 +113,19 @@ residue_predictor = ResiduePredictor(args.num_primary_color).to(device)
 residue_predictor = nn.DataParallel(residue_predictor)
 residue_predictor = residue_predictor.cuda()
 
-loss_fn_alex  = lpips.LPIPS(net='alex')
+# mask_generator = MaskGenerator(args.num_primary_color)
+# mask_generator = BalancedDataParallel(gpu0_bsz, mask_generator, dim = 0).to(device)
+# mask_generator = mask_generator.cuda()
+
+# residue_predictor = ResiduePredictor(args.num_primary_color)
+# residue_predictor = BalancedDataParallel( gpu0_bsz, residue_predictor, dim=0).to(device)
+# residue_predictor = residue_predictor.cuda()
+
+loss_fn_alex  = lpips.LPIPS(net='alex',eval_mode=False)
 loss_fn_alex = loss_fn_alex.cuda()
+
+loss_fn_alex_eval  = lpips.LPIPS(net='alex',eval_mode=True)
+loss_fn_alex_eval = loss_fn_alex_eval.cuda()
 
 params = list(mask_generator.parameters())
 params += list(residue_predictor.parameters())
@@ -187,7 +207,7 @@ def train(epoch,min_train_loss):
         l_loss = loss_fn_alex.forward(reconst_img,target_img_).mean() * args.lpips_loss_lambda
         reconst_img = im2tensor2(reconst_img)
 
-        total_loss = r_loss + m_loss + d_loss + l_loss
+        total_loss = r_loss + m_loss + d_loss  + l_loss
 
         if (math.isnan(total_loss.item())):
             print('----------------------------------------- total_loss is nan, continue... -----------------------------------------')
@@ -267,6 +287,7 @@ def val(epoch, min_val_loss):
         # s_loss_mean = 0
         d_loss_mean = 0
         l_loss_mean = 0
+        batch_num = 0
 
         pbar = tqdm(total=len(val_loader))
 
@@ -295,7 +316,7 @@ def val(epoch, min_val_loss):
 
             reconst_img = im2tensor(reconst_img)
             target_img_ = im2tensor(target_img.detach())
-            l_loss = loss_fn_alex.forward(reconst_img,target_img_).mean() * args.lpips_loss_lambda
+            l_loss = loss_fn_alex_eval.forward(reconst_img,target_img_).mean() * args.lpips_loss_lambda
             reconst_img = im2tensor2(reconst_img)
 
             total_loss = r_loss + m_loss + d_loss + l_loss
@@ -308,6 +329,7 @@ def val(epoch, min_val_loss):
             l_loss_mean += l_loss.item()
 
             pbar.update(1)
+            batch_num += 1
 
             save_layer_number = 0
             if batch_idx <= 1:
@@ -321,12 +343,11 @@ def val(epoch, min_val_loss):
 
         pbar.close()
 
-        val_loss = val_loss / len(val_loader.dataset)
-        r_loss_mean = r_loss_mean / len(val_loader.dataset)
-        m_loss_mean = m_loss_mean / len(val_loader.dataset)
-        # s_loss_mean = s_loss_mean / len(val_loader.dataset)
-        d_loss_mean = d_loss_mean / len(val_loader.dataset)
-        l_loss_mean = l_loss_mean / len(val_loader.dataset)
+        val_loss = val_loss / batch_num
+        r_loss_mean = r_loss_mean / batch_num
+        m_loss_mean = m_loss_mean / batch_num
+        d_loss_mean = d_loss_mean / batch_num
+        l_loss_mean = l_loss_mean / batch_num
 
         print('====> Epoch: {} Average val loss: {:.6f}'.format(epoch, val_loss ))
         print('====> Epoch: {} Average val reconst_loss *lambda: {:.6f}'.format(epoch, r_loss_mean ))

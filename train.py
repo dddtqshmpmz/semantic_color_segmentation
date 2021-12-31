@@ -33,7 +33,7 @@ import segmentation_models.segmentation_models_pytorch as smp
 import archs
 import losses
 from dataset import Dataset,DatasetSemanColor,DatasetSemanColor2Decoder
-from metrics import iou_score, dice_coef
+from metrics import iou_score, dice_coef,precision,recall
 from utils import AverageMeter, str2bool
 from util import psnr,ssim,reconst_loss,temp_distance,squared_mahalanobis_distance_loss,alpha_normalize,mono_color_reconst_loss
 
@@ -49,7 +49,7 @@ parser.add_argument('--run_name', type=str, default='train', help='run-name. Thi
 parser.add_argument('--batch_size', type=int, default=20, metavar='N',  ## 32-> 4
                     help='input batch size for training (default: 32)')
 
-parser.add_argument('--after_batch_size', type=int, default= 28, metavar='N',  ## 32-> 4
+parser.add_argument('--after_batch_size', type=int, default= 24, metavar='N',  ## 32-> 4
                     help='input batch size for training after color model complete (default: 32)')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', ## 10
                     help='number of epochs to train (default: 10)')
@@ -221,7 +221,7 @@ optimizer = optim.Adam(params, lr=config['color_lr'], betas=(0.0, 0.99)) # 0926
 
 
 # 加载新参数
-model = smp.UnetWithColor('efficientnet-b3', in_channels= 3+28 ,
+model = smp.UnetWithColor('efficientnet-b3', in_channels= 3+21 ,
                      classes= 1, encoder_weights='imagenet').cuda()
 model = model.cuda()
 model= nn.DataParallel(model,device_ids=[0,1,2,3])
@@ -472,9 +472,11 @@ def train_after_finish_color_seg(epoch,min_train_loss):
         residue = residue_pack.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
         #pred_unmixed_rgb_layers = mono_color_layers + residue * processed_alpha_layers
         pred_unmixed_rgb_layers = torch.clamp((primary_color_layers + residue), min=0., max=1.0)# * processed_alpha_layers
-        mixed_rgb_color_layers = torch.cat((pred_unmixed_rgb_layers, processed_alpha_layers), 2)
-        mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
 
+        # mixed_rgb_color_layers = torch.cat((pred_unmixed_rgb_layers, processed_alpha_layers), 2)
+        # mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+        mixed_rgb_color_layers = pred_unmixed_rgb_layers * processed_alpha_layers
+        mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
 
         # alpha addしてreconst_imgを作成する
         #reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
@@ -654,7 +656,10 @@ def val_after_finish_color_seg(epoch,min_val_loss):
             residue_pack  = residue_predictor(target_img, mono_color_layers_pack)
             residue = residue_pack.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
             pred_unmixed_rgb_layers = torch.clamp((primary_color_layers + residue), min=0., max=1.0)
-            mixed_rgb_color_layers = torch.cat((pred_unmixed_rgb_layers, processed_alpha_layers), 2)
+
+            # mixed_rgb_color_layers = torch.cat((pred_unmixed_rgb_layers, processed_alpha_layers), 2)
+            # mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+            mixed_rgb_color_layers = pred_unmixed_rgb_layers * processed_alpha_layers
             mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
 
             reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
@@ -682,6 +687,126 @@ def val_after_finish_color_seg(epoch,min_val_loss):
         pbar.close()
 
         return OrderedDict([('loss', avg_meters['loss'].avg), ('dice', avg_meters['dice'].avg),('min_val_loss',min_val_loss)])
+    
+
+def test_for_paper():
+    avg_meters = {'loss': AverageMeter(),
+                'dice': AverageMeter(),
+                'iou': AverageMeter(),
+                'precision': AverageMeter(),
+                'recall': AverageMeter()}  # iou
+
+    mask_generator.eval()
+    residue_predictor.eval()
+    model.eval()
+
+    with torch.no_grad():
+
+        pbar = tqdm(total=len(val_after_loader))
+
+        for batch_idx, (target_img, primary_color_layers,mask ) in enumerate(val_after_loader):
+            target_img = target_img.to(device) # bn, 3ch, h, w
+            primary_color_layers = primary_color_layers.to(device)
+            mask = mask.to(device)
+
+            primary_color_pack = primary_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+            pred_alpha_layers_pack = mask_generator(target_img, primary_color_pack)
+            pred_alpha_layers = pred_alpha_layers_pack.view(target_img.size(0), -1, 1, target_img.size(2), target_img.size(3))
+            processed_alpha_layers = alpha_normalize(pred_alpha_layers)
+            mono_color_layers = torch.cat((primary_color_layers, processed_alpha_layers), 2) #shape: bn, ln, 4, h, w
+            mono_color_layers_pack = mono_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+            residue_pack  = residue_predictor(target_img, mono_color_layers_pack)
+            residue = residue_pack.view(target_img.size(0), -1, 3, target_img.size(2), target_img.size(3))
+            pred_unmixed_rgb_layers = torch.clamp((primary_color_layers + residue), min=0., max=1.0)
+
+            # mixed_rgb_color_layers = torch.cat((pred_unmixed_rgb_layers, processed_alpha_layers), 2)
+            # mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+            mixed_rgb_color_layers = pred_unmixed_rgb_layers * processed_alpha_layers
+            mixed_rgb_color_layers_pack = mixed_rgb_color_layers.view(target_img.size(0), -1 , target_img.size(2), target_img.size(3))
+
+            reconst_img = (pred_unmixed_rgb_layers * processed_alpha_layers).sum(dim=1)
+            mono_color_reconst_img = (primary_color_layers * processed_alpha_layers).sum(dim=1)
+
+            # output = model(torch.cat((target_img.detach(),mono_color_layers_pack.detach()[:,:28,:,:]),1),mono_color_layers_pack.detach())
+            # processed_alpha_layers_ = torch.squeeze(processed_alpha_layers.detach(),dim=2)
+            output = model(torch.cat((target_img.detach(),mixed_rgb_color_layers_pack.detach()),1),mixed_rgb_color_layers_pack.detach())
+            # output = model(torch.cat((target_img.detach(),processed_alpha_layers_.detach()[:,:7,:,:]),1),processed_alpha_layers_.detach())
+            # output = model(target_img.detach())
+
+            loss = criterion(output, mask)
+            dice = dice_coef(output, mask)
+            iou_ = iou_score(output,mask)
+            precision_ = precision(output,mask)
+            recall_ = recall(output,mask)
+
+            avg_meters['loss'].update(loss.item(), target_img.size(0))
+            avg_meters['dice'].update(dice, target_img.size(0))
+            avg_meters['iou'].update(iou_, target_img.size(0))
+            avg_meters['precision'].update(precision_, target_img.size(0))
+            avg_meters['recall'].update(recall_, target_img.size(0))
+
+            if (batch_idx % 10 == 0):
+                save_dir = 'results/val/train_1124_base'
+                
+                try:
+                    os.makedirs(save_dir)
+                except OSError:
+                    pass
+
+                save_layer_number = 0
+                save_image(primary_color_layers[save_layer_number, :, :, :, :],
+                           save_dir + '/img-%02d_primary_color_layers.png' % batch_idx)
+                save_image(reconst_img[save_layer_number, :, :, :].unsqueeze(0),
+                           save_dir + '/img-%02d_reconst_img.png' % batch_idx)
+                save_image(target_img[save_layer_number, :, :, :].unsqueeze(0),
+                           save_dir + '/img-%02d_target_img.png' % batch_idx)
+                
+                
+                # RGBAの４chのpngとして保存する 另存为RGBA 4ch png
+                # out: bn, ln = 7, 4, h, w
+                RGBA_layers = torch.cat(
+                    (pred_unmixed_rgb_layers, processed_alpha_layers), dim=2)
+                # test ではバッチサイズが１なので，bn部分をなくす 在测试中，批量大小为1，因此消除了bn部分。
+                RGBA_layers = RGBA_layers[0]  # ln, 4. h, w
+                # ln ごとに結果を保存する
+                for i in range(len(RGBA_layers)):
+                    save_image(
+                        RGBA_layers[i, :, :, :], save_dir+'/img-%02d_layer-%02d.png' % (batch_idx, i))
+                '''
+                # 処理後のアルファの保存 processed_alpha_layers 保存已处理的alpha已处理的alpha_layers
+                for i in range(len(processed_alpha_layers[0])):
+                    save_image(
+                        processed_alpha_layers[0, i, :, :, :], 'results/val/proc-alpha-%02d-00_layer-%02d.png' % (batch_idx, i))
+
+                # 処理後のRGBの保存 处理后保存RGB
+                for i in range(len(pred_unmixed_rgb_layers[0])):
+                    save_image(
+                        pred_unmixed_rgb_layers[0, i, :, :, :], 'results/val/rgb-00_layer-%02d-%02d.png' % (batch_idx, i))'''
+
+                # output the pred mask pics
+                seg_output = torch.sigmoid(output)
+                zero = torch.zeros_like(seg_output)
+                one = torch.ones_like(seg_output)
+                seg_output = torch.where(seg_output > 0.5, one, zero)
+                seg_output = seg_output.data.cpu().numpy()
+
+                cv2.imwrite(os.path.join(save_dir, 'semantic-output-%02d.png' % (batch_idx)),
+                            (seg_output[0, 0] * 255).astype('uint8'))
+
+            postfix = OrderedDict([
+                ('loss', avg_meters['loss'].avg),
+                ('dice', avg_meters['dice'].avg),
+                ('iou', avg_meters['iou'].avg),
+                ('precision', avg_meters['precision'].avg),
+                ('recall', avg_meters['recall'].avg)
+            ])
+            pbar.set_postfix(postfix)
+            pbar.update(1)
+
+        pbar.close()
+
+        return OrderedDict([('loss', avg_meters['loss'].avg), ('dice', avg_meters['dice'].avg),('min_val_loss',min_val_loss)])
+
 
 
 if __name__ == "__main__":
@@ -703,28 +828,36 @@ if __name__ == "__main__":
 
     load_flag = 0
     train_all_flag = 1
-    path_mask_generator = 'results/train/mask_generator.pth'
-    path_residue_predictor = 'results/train/residue_predictor.pth'
+    path_mask_generator = 'results/train/dedicated_color_models/mask_generator.pth'
+    path_residue_predictor = 'results/train/dedicated_color_models/residue_predictor.pth'
 
+    mask_generator.load_state_dict(torch.load(path_mask_generator))
+    residue_predictor.load_state_dict(torch.load(path_residue_predictor))
+
+    path_model = 'models/multitask/20211124/model_epoch_50.pth'
+    model.load_state_dict(torch.load(path_model))
 
     for epoch in range(1, args.epochs + 1):
         print('Start training')
 
         if train_all_flag == 1:
-            train_log = train(epoch,min_train_loss)
-            # train_log = train_after_finish_color_seg(epoch, min_train_loss)
+            # train_log = train(epoch,min_train_loss)
+            test_for_paper()
+
+            train_log = train_after_finish_color_seg(epoch, min_train_loss)
             if (train_log['min_train_loss'] == -1):
                 train_all_flag = 0
         else:
             train_log = train_after_finish_color_seg(epoch, min_train_loss)
 
-        if (load_flag == 0 and train_all_flag == 0):
-            load_flag = 1
-            mask_generator.load_state_dict(torch.load(path_mask_generator))
-            residue_predictor.load_state_dict(torch.load(path_residue_predictor))
+        # if (load_flag == 0 and train_all_flag == 0):
+        #     load_flag = 1
+        #     mask_generator.load_state_dict(torch.load(path_mask_generator))
+        #     residue_predictor.load_state_dict(torch.load(path_residue_predictor))
         
         if train_all_flag == 1:
-            val_log = val(epoch,min_val_loss)
+            # val_log = val(epoch,min_val_loss)
+            val_log = val_after_finish_color_seg(epoch, min_val_loss)
         else:
             val_log = val_after_finish_color_seg(epoch, min_val_loss)
 

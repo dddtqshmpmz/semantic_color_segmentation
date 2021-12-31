@@ -23,6 +23,8 @@ import torch.optim as optim
 from torchsummary import summary
 from guided_filter_pytorch.guided_filter import GuidedFilter
 import time
+from util import delta_E
+import lpips
 
 import yaml
 from albumentations.augmentations import transforms
@@ -304,6 +306,11 @@ def mask_operate(alpha_layers, target_layer_number, mask_path):
     
     return return_alpha_layers
 
+def im2tensor(image, imtype=np.uint8, cent=1., factor=2.):
+    return (image * factor - cent)
+
+def im2tensor2(image, imtype=np.uint8, cent=1., factor=2.):
+    return ( (image+cent)/factor )
 
 
 #### User inputs
@@ -318,6 +325,7 @@ rec_loss_lambda = 1.0
 m_loss_lambda = 1.0
 sparse_loss_lambda = 0.0
 distance_loss_lambda = 0.5
+lpips_loss_lambda = 0.5
 
 # 设置哪台机器上跑test
 device_id = 0
@@ -353,9 +361,9 @@ mask_generator = mask_generator.cuda(device)
 residue_predictor = nn.DataParallel(residue_predictor,device_ids=[0,1,2,3])
 residue_predictor = residue_predictor.cuda(device)
 
-mask_generator_seg2color = nn.DataParallel(mask_generator_seg2color,device_ids=[0,1,2])
+mask_generator_seg2color = nn.DataParallel(mask_generator_seg2color,device_ids=[0,1,2,3])
 mask_generator_seg2color = mask_generator_seg2color.cuda(device)
-residue_predictor_seg2color = nn.DataParallel(residue_predictor_seg2color,device_ids=[0,1,2])
+residue_predictor_seg2color = nn.DataParallel(residue_predictor_seg2color,device_ids=[0,1,2,3])
 residue_predictor_seg2color = residue_predictor_seg2color.cuda(device)
 
 
@@ -369,9 +377,9 @@ mask_path = 'path/to/mask.image'
 print('Start!')
 
 
-path_mask_generator = 'results/train/20211013_1/mask_generator.pth'
-path_residue_predictor = 'results/train/20211013_1/residue_predictor.pth'
-path_seg_model = 'models/multitask/20211013_1_9004/model.pth'
+path_mask_generator = 'results/train/20211115/mask_generator.pth'
+path_residue_predictor = 'results/train/20211115/residue_predictor.pth'
+path_seg_model = 'models/multitask/20211117_9038/model.pth'
 
 path_mask_generator_seg2color = 'results/train/20211015_1/mask_generator.pth'
 path_residue_predictor_seg2color = 'results/train/20211015_1/residue_predictor.pth'
@@ -382,6 +390,9 @@ residue_predictor.load_state_dict(torch.load(path_residue_predictor))
 model.load_state_dict(torch.load(path_seg_model))
 mask_generator_seg2color.load_state_dict(torch.load(path_mask_generator_seg2color))
 residue_predictor_seg2color.load_state_dict(torch.load(path_residue_predictor_seg2color))
+
+loss_fn_alex_eval  = lpips.LPIPS(net='alex',eval_mode=True)
+loss_fn_alex_eval = loss_fn_alex_eval.cuda()
 
 mask_generator_seg2color.eval()
 residue_predictor_seg2color.eval()
@@ -398,18 +409,21 @@ with torch.no_grad():
     test_loss = 0   
     r_loss_mean = 0
     m_loss_mean = 0
-    s_loss_mean = 0
     d_loss_mean = 0
+    l_loss_mean = 0
     psnr_mean = 0
     ssim_mean = 0
+    deltaE_mean = 0
     batch_num = 0
     
     pbar = tqdm(total=len(test_loader))
 
     for batch_idx, (target_img, primary_color_layers) in enumerate(test_loader):
         pbar.update(1)
-        # if batch_idx < 378: 
+
+        # if batch_idx < 451: 
         #     continue
+
         print('img #', batch_idx)
 
         target_img = cut_edge(target_img)
@@ -473,23 +487,33 @@ with torch.no_grad():
         d_loss = squared_mahalanobis_distance_loss(primary_color_layers.detach(), processed_alpha_layers, pred_unmixed_rgb_layers) * distance_loss_lambda
         psnr_res = psnr(reconst_img, target_img)
         ssim_res = ssim(reconst_img, target_img)
+        delta_E_res = delta_E(reconst_img,target_img)
 
-        total_loss = r_loss + m_loss + d_loss
+        reconst_img = im2tensor(reconst_img)
+        target_img_ = im2tensor(target_img.detach())
+        l_loss = loss_fn_alex_eval.forward(reconst_img,target_img_).mean() * lpips_loss_lambda
+        reconst_img = im2tensor2(reconst_img)
+
+        total_loss = r_loss + m_loss + d_loss + l_loss
         print('total_loss', total_loss)
         test_loss += total_loss.item()
         r_loss_mean += r_loss.item()
         m_loss_mean += m_loss.item()
         # s_loss_mean += s_loss.item()
         d_loss_mean += d_loss.item()
+        l_loss_mean += l_loss.item()
 
         psnr_mean += psnr_res.item()
         ssim_mean += ssim_res.item()
+        deltaE_mean += delta_E_res.item()
 
         print('r_loss:', r_loss)
         print('m_loss:', m_loss)
         print('d_loss:', d_loss)
+        print('l_loss:', l_loss)
         print('psnr:', psnr_res)
         print('ssim:', ssim_res)
+        print('delta_e:', delta_E_res)
         # print('sparsity:',s_loss)
 
         
@@ -508,6 +532,15 @@ with torch.no_grad():
             save_image(target_img[save_layer_number,:,:,:].unsqueeze(0),
                    'results/%s/test/test' % (run_name)  + '_img-%02d_target_img.png' % batch_idx)
 
+            # RGBAの４chのpngとして保存する 另存为RGBA 4ch png
+            RGBA_layers = torch.cat((pred_unmixed_rgb_layers, processed_alpha_layers), dim=2) # out: bn, ln = 7, 4, h, w
+            # test ではバッチサイズが１なので，bn部分をなくす 在测试中，批量大小为1，因此消除了bn部分。
+            RGBA_layers = RGBA_layers[0] # ln, 4. h, w
+            # ln ごとに結果を保存する
+            for i in range(len(RGBA_layers)):
+                save_image(RGBA_layers[i, :, :, :], 'results/%s/test/test_img-%02d_layer-%02d.png' % (run_name, batch_idx, i) )
+
+
             print('Saved to results/%s/test/...' % (run_name))
            
     pbar.close()
@@ -517,20 +550,23 @@ with torch.no_grad():
     m_loss_mean = m_loss_mean / batch_num
     # s_loss_mean = s_loss_mean / batch_num
     d_loss_mean = d_loss_mean / batch_num
+    l_loss_mean = l_loss_mean / batch_num
     
     psnr_mean = psnr_mean / batch_num
     ssim_mean = ssim_mean / batch_num
+    deltaE_mean = deltaE_mean / batch_num
 
     print('====> Average test loss: {:.6f}'.format(test_loss ))
     print('====> Average test reconst_loss *lambda: {:.6f}'.format( r_loss_mean ))
     print('====> Average test mono_loss *lambda: {:.6f}'.format( m_loss_mean ))
     print('====> Average test squared_mahalanobis_distance_loss *lambda: {:.6f}'.format( d_loss_mean ))
+    print('====> Average test lpips *lambda: {:.6f}'.format( l_loss_mean ))
+
 
     print('====> Average test psnr: {:.6f}'.format( psnr_mean ))
     print('====> Average test ssim: {:.6f}'.format( ssim_mean ))
+    print('====> Average test delta_e: {:.6f}'.format( deltaE_mean ))
     # print('====> Average test sparse_loss: {:.6f}'.format( s_loss_mean ))
 
     print('mean_estimation_time: ', mean_estimation_time / batch_num )
     
-
-
